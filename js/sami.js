@@ -1,182 +1,138 @@
-// @ts-nocheck
 // =============================================================
-// Module SAMI : gestion des évaluations, compétences, historique
-// =============================================================
-
-// Clé de stockage
-const SAMI_STORAGE_KEY = "samiEvaluations";
-
-// Données en mémoire
-let samiEvaluations = loadJSON(SAMI_STORAGE_KEY, []);
-
-// Sélecteurs principaux
-const samiList = document.getElementById("sami-list");
-const samiHistory = document.getElementById("sami-history");
-const samiSynthesis = document.getElementById("sami-synthesis");
-const samiCompetenceTable = document.querySelector("#sami-competence-list tbody");
-
-// Champs du formulaire
-const fieldGS = document.getElementById("sami-gs");
-const fieldDate = document.getElementById("sami-date");
-const fieldEvaluateur = document.getElementById("sami-evaluateur");
-const fieldCompIntitule = document.getElementById("sami-comp-intitule");
-const fieldCompNivVise = document.getElementById("sami-comp-niv-vise");
-const fieldCompNivAtteint = document.getElementById("sami-comp-niv-atteint");
-const fieldCommentaire = document.getElementById("sami-commentaire");
-
-// Boutons
-const btnAddCompetence = document.getElementById("btn-add-competence");
-const btnSaveSami = document.getElementById("btn-save-sami");
-const btnClearSami = document.getElementById("btn-clear-sami");
-
-// Liste temporaire des compétences avant enregistrement
-let tempCompetences = [];
-
-// =============================================================
-// Ajout d'une compétence dans la table temporaire
+// Module SAMI – Vision Essais
 // =============================================================
 
-btnAddCompetence?.addEventListener("click", () => {
-  const intitule = fieldCompIntitule.value.trim();
-  if (!intitule) return alert("Veuillez saisir une compétence.");
+// Stockage local
+const STORAGE_KEY = "visionEssais_sami_evaluations";
 
-  const competence = {
-    intitule,
-    vise: fieldCompNivVise.value,
-    atteint: fieldCompNivAtteint.value
-  };
+// =============================================================
+// Initialisation de l'écran SAMI
+// =============================================================
 
-  tempCompetences.push(competence);
-  renderTempCompetences();
+export function initSami() {
+  console.log("SAMI : écran initialisé");
 
-  fieldCompIntitule.value = "";
-});
+  const btnAdd = document.getElementById("btn-add-competence");
+  const btnSave = document.getElementById("btn-save-sami");
+  const btnClear = document.getElementById("btn-clear-sami");
 
-/**
- * Affiche les compétences ajoutées dans la table temporaire
- */
-function renderTempCompetences() {
-  samiCompetenceTable.innerHTML = "";
+  if (btnAdd) btnAdd.addEventListener("click", addCompetence);
+  if (btnSave) btnSave.addEventListener("click", saveEvaluation);
+  if (btnClear) btnClear.addEventListener("click", clearForm);
 
-  tempCompetences.forEach(c => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${c.intitule}</td>
-      <td>${c.vise}</td>
-      <td>${c.atteint}</td>
-    `;
-    samiCompetenceTable.appendChild(tr);
+  renderCompetenceList([]);
+  renderHistory();
+  renderSynthesis();
+}
+
+// =============================================================
+// Ajout d'une compétence dans le tableau
+// =============================================================
+
+function addCompetence() {
+  const intitule = document.getElementById("sami-comp-intitule").value.trim();
+  const vise = document.getElementById("sami-comp-niv-vise").value;
+  const atteint = document.getElementById("sami-comp-niv-atteint").value;
+
+  if (!intitule) {
+    alert("Veuillez saisir un intitulé de compétence.");
+    return;
+  }
+
+  const table = document.getElementById("sami-competence-list");
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td>${intitule}</td>
+    <td>${vise}</td>
+    <td>${atteint}</td>
+    <td><button class="delete-comp">Supprimer</button></td>
+  `;
+
+  table.appendChild(row);
+
+  row.querySelector(".delete-comp").addEventListener("click", () => {
+    row.remove();
   });
 }
 
 // =============================================================
-// Enregistrement d'une évaluation complète
+// Sauvegarde d'une évaluation SAMI
 // =============================================================
 
-btnSaveSami?.addEventListener("click", () => {
-  if (!fieldGS.value) return alert("Veuillez choisir un module GS.");
-  if (tempCompetences.length === 0) return alert("Veuillez ajouter au moins une compétence.");
+function saveEvaluation() {
+  const gs = document.getElementById("sami-gs").value;
+  const date = document.getElementById("sami-date").value;
+  const evaluateur = document.getElementById("sami-evaluateur").value;
+  const commentaire = document.getElementById("sami-commentaire").value;
+
+  const competences = [];
+  document.querySelectorAll("#sami-competence-list tr").forEach(row => {
+    const cells = row.querySelectorAll("td");
+    competences.push({
+      intitule: cells[0].innerText,
+      vise: cells[1].innerText,
+      atteint: cells[2].innerText
+    });
+  });
 
   const evaluation = {
     id: Date.now(),
-    date: fieldDate.value || new Date().toLocaleDateString("fr-FR"),
-    gs: fieldGS.value,
-    evaluateur: fieldEvaluateur.value.trim(),
-    commentaire: fieldCommentaire.value.trim(),
-    competences: [...tempCompetences]
+    gs,
+    date,
+    evaluateur,
+    commentaire,
+    competences
   };
 
-  samiEvaluations.push(evaluation);
-  saveJSON(SAMI_STORAGE_KEY, samiEvaluations);
+  const all = loadAllEvaluations();
+  all.push(evaluation);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
 
-  // Reset du formulaire
-  tempCompetences = [];
-  renderTempCompetences();
-  fieldCommentaire.value = "";
-  fieldCompIntitule.value = "";
-
-  renderSamiList();
+  alert("Évaluation enregistrée.");
   renderHistory();
   renderSynthesis();
-
-  alert("Évaluation enregistrée !");
-});
-
-// =============================================================
-// Suppression d'une évaluation
-// =============================================================
-
-function deleteSamiEntry(id) {
-  if (!confirm("Supprimer cette évaluation ?")) return;
-
-  samiEvaluations = samiEvaluations.filter(e => e.id !== id);
-  saveJSON(SAMI_STORAGE_KEY, samiEvaluations);
-
-  renderSamiList();
-  renderHistory();
-  renderSynthesis();
-}
-
-window.deleteSamiEntry = deleteSamiEntry;
-
-// =============================================================
-// Rendu de la liste principale des évaluations
-// =============================================================
-
-function renderSamiList() {
-  if (!samiList) return;
-
-  samiList.innerHTML = "";
-
-  if (samiEvaluations.length === 0) {
-    samiList.innerHTML = `<p class="text-muted small">Aucune évaluation saisie pour le moment.</p>`;
-    return;
-  }
-
-  samiEvaluations.forEach(ev => {
-    const div = document.createElement("div");
-    div.className = "sami-entry";
-
-    div.innerHTML = `
-      <div>
-        <strong>${ev.gs}</strong> — <span class="text-muted small">${ev.date}</span><br>
-        <em>${ev.commentaire || "Aucun commentaire"}</em><br>
-        <span class="small">${ev.competences.length} compétence(s)</span>
-      </div>
-      <button class="btn-danger" onclick="deleteSamiEntry(${ev.id})">Supprimer</button>
-    `;
-
-    samiList.appendChild(div);
-  });
+  clearForm();
 }
 
 // =============================================================
-// Historique chronologique
+// Nettoyage du formulaire
+// =============================================================
+
+function clearForm() {
+  document.getElementById("sami-gs").value = "";
+  document.getElementById("sami-date").value = "";
+  document.getElementById("sami-evaluateur").value = "";
+  document.getElementById("sami-commentaire").value = "";
+  document.getElementById("sami-competence-list").innerHTML = "";
+}
+
+// =============================================================
+// Chargement des évaluations
+// =============================================================
+
+function loadAllEvaluations() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}
+
+// =============================================================
+// Affichage de l'historique
 // =============================================================
 
 function renderHistory() {
-  if (!samiHistory) return;
+  const container = document.getElementById("sami-history");
+  if (!container) return;
 
-  samiHistory.innerHTML = "";
+  const all = loadAllEvaluations();
 
-  if (samiEvaluations.length === 0) {
-    samiHistory.innerHTML = `<p class="text-muted small">Aucun historique disponible.</p>`;
-    return;
-  }
-
-  const sorted = [...samiEvaluations].sort((a, b) => b.id - a.id);
-
-  sorted.forEach(ev => {
-    const div = document.createElement("div");
-    div.className = "history-entry";
-
-    div.innerHTML = `
-      <strong>${ev.date}</strong> — ${ev.gs}
-      <span class="small">(${ev.competences.length} comp.)</span>
-    `;
-
-    samiHistory.appendChild(div);
-  });
+  container.innerHTML = all
+    .map(ev => `
+      <div class="history-item">
+        <strong>${ev.gs}</strong> – ${ev.date} – ${ev.evaluateur}<br>
+        ${ev.competences.length} compétence(s)
+      </div>
+    `)
+    .join("");
 }
 
 // =============================================================
@@ -184,59 +140,55 @@ function renderHistory() {
 // =============================================================
 
 function renderSynthesis() {
-  if (!samiSynthesis) return;
+  const container = document.getElementById("sami-synthesis");
+  if (!container) return;
 
-  if (samiEvaluations.length === 0) {
-    samiSynthesis.innerHTML = `<p class="text-muted small">Aucune évaluation saisie pour le moment.</p>`;
-    return;
-  }
+  const all = loadAllEvaluations();
 
-  let countS = 0, countA = 0, countM = 0, countI = 0;
+  const stats = { S: 0, A: 0, M: 0, I: 0 };
 
-  samiEvaluations.forEach(ev => {
+  all.forEach(ev => {
     ev.competences.forEach(c => {
-      if (c.atteint === "S") countS++;
-      if (c.atteint === "A") countA++;
-      if (c.atteint === "M") countM++;
-      if (c.atteint === "I") countI++;
+      if (stats[c.atteint] !== undefined) {
+        stats[c.atteint]++;
+      }
     });
   });
 
-  samiSynthesis.innerHTML = `
-    <p><strong>Total compétences évaluées :</strong> ${countS + countA + countM + countI}</p>
+  container.innerHTML = `
     <ul>
-      <li><span class="badge badge-s">S</span> : ${countS}</li>
-      <li><span class="badge badge-a">A</span> : ${countA}</li>
-      <li><span class="badge badge-m">M</span> : ${countM}</li>
-      <li><span class="badge badge-i">I</span> : ${countI}</li>
+      <li>S : ${stats.S}</li>
+      <li>A : ${stats.A}</li>
+      <li>M : ${stats.M}</li>
+      <li>I : ${stats.I}</li>
     </ul>
   `;
 }
 
 // =============================================================
-// Effacer toutes les évaluations
+// Traitement du PDF importé
 // =============================================================
 
-btnClearSami?.addEventListener("click", () => {
-  if (!confirm("Effacer toutes les évaluations ?")) return;
+export function processSamiPdf(text) {
+  console.log("Traitement PDF SAMI…");
 
-  samiEvaluations = [];
-  saveJSON(SAMI_STORAGE_KEY, samiEvaluations);
+  // Exemple simple : extraction du GS
+  const gsMatch = text.match(/GS ?(\d+)/i);
+  if (gsMatch) {
+    document.getElementById("sami-gs").value = "GS" + gsMatch[1];
+  }
 
-  renderSamiList();
-  renderHistory();
-  renderSynthesis();
-});
+  // Exemple : extraction du formateur
+  const evalMatch = text.match(/Évaluateur ?: ([A-Za-zÀ-ÖØ-öø-ÿ ]+)/i);
+  if (evalMatch) {
+    document.getElementById("sami-evaluateur").value = evalMatch[1].trim();
+  }
 
-// =============================================================
-// Initialisation du module SAMI
-// =============================================================
+  // Exemple : extraction de la date
+  const dateMatch = text.match(/(\d{2}\/\d{2}\/\d{4})/);
+  if (dateMatch) {
+    document.getElementById("sami-date").value = dateMatch[1];
+  }
 
-function initSamiModule() {
-  renderTempCompetences();
-  renderSamiList();
-  renderHistory();
-  renderSynthesis();
+  alert("PDF analysé et champs pré-remplis.");
 }
-
-window.initSamiModule = initSamiModule;
