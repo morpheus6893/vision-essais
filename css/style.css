@@ -235,3 +235,17 @@ nav button.active {
 .profile ul li {
   margin-bottom: 0.3rem;
 }
+
+/* === Logo Vision Essais === */
+.logo-vision {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  width: 110px;        /* taille réduite */
+  opacity: 0.95;
+  z-index: 10;
+}
+
+.screen-accueil {
+  position: relative;   /* nécessaire pour positionner le logo */
+}
