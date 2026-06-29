@@ -1,44 +1,63 @@
 <section class="screen-accueil">
+  <h2>Tableau de bord – Agent d’essais</h2>
 
-  <h2>Bienvenue dans Vision Essais</h2>
-  <p class="intro">
-    Livret digitalisé – Suivi de parcours, évaluations SAMI, ressources et outils tuteur.
-  </p>
-
-  <!-- Profil agent -->
-  <div class="card">
-    <h3>Profil agent</h3>
-    <ul>
-      <li><strong>Nom :</strong> <span id="acc-nom">—</span></li>
-      <li><strong>Prénom :</strong> <span id="acc-prenom">—</span></li>
-      <li><strong>Matricule :</strong> <span id="acc-matricule">—</span></li>
-      <li><strong>Site :</strong> <span id="acc-site">—</span></li>
-    </ul>
-  </div>
-
-  <!-- Tuteur -->
-  <div class="card">
-    <h3>Tuteur</h3>
-    <ul>
-      <li><strong>Nom :</strong> <span id="acc-tuteur-nom">—</span></li>
-      <li><strong>Prénom :</strong> <span id="acc-tuteur-prenom">—</span></li>
-    </ul>
-  </div>
-
-  <!-- Avancement -->
-  <div class="card">
-    <h3>Avancement du parcours</h3>
-    <div class="progress">
-      <div id="acc-progress-bar" class="progress-bar" style="width: 0%"></div>
+  <div class="dashboard-grid">
+    <!-- Profil -->
+    <div class="card">
+      <h3>Mon profil</h3>
+      <div class="profile">
+        <img src="img/profil.jpg" alt="Photo agent" class="profile-photo">
+        <ul>
+          <li><strong>Nom :</strong> Tristan ANTOINE</li>
+          <li><strong>Unité :</strong> Essais Dijon</li>
+          <li><strong>Poste :</strong> Agent d’essais</li>
+          <li><strong>Session :</strong> 14 Bis</li>
+          <li><strong>Statut :</strong> Parcours en cours – 1 / 12 mois</li>
+        </ul>
+      </div>
     </div>
-    <p id="acc-progress-text">0% complété</p>
-  </div>
 
-  <!-- Actions rapides -->
-  <div class="quick-actions">
-    <button id="acc-open-sami">Accéder à SAMI</button>
-    <button id="acc-open-parcours">Voir mon parcours</button>
-    <button id="acc-open-stages">Stages & formations</button>
-  </div>
+    <!-- Tuteur -->
+    <div class="card">
+      <h3>Mon tuteur</h3>
+      <ul>
+        <li><strong>Nom :</strong> CONREUR Loïc</li>
+        <li><strong>Fonction :</strong> Agent d’essais confirmé</li>
+        <li><strong>Tél :</strong> 06 00 00 00 00</li>
+        <li><strong>Mail :</strong> loic.conreur1@reseau.sncf.fr</li>
+      </ul>
+      <p class="note">Le tuteur prépare ton arrivée, organise les séquences de travail, suit ta progression et t’évalue régulièrement.</p>
+    </div>
 
+    <!-- Jalons -->
+    <div class="card">
+      <h3>Jalons d’intégration</h3>
+      <ul>
+        <li>J0 Accueil (02/09/2024)</li>
+        <li>J+15 Point d’intégration (à venir)</li>
+        <li>3 mois Entretien d’étape</li>
+        <li>6 mois Bilan intermédiaire</li>
+        <li>9 mois Préparation autonomie</li>
+        <li>12 mois Bilan final</li>
+      </ul>
+    </div>
+
+    <!-- Étapes -->
+    <div class="card">
+      <h3>Prochaines étapes (Session 14 Bis)</h3>
+      <ul>
+        <li><strong>GS1 – Tronc Commun Essais :</strong> 09 → 13/09/2024</li>
+        <li><strong>Découverte INFRAPOLE :</strong> 16 → 27/09/2024</li>
+        <li><strong>GS2 – Détection des circulations :</strong> 30/09 → 04/10/2024</li>
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="card actions">
+      <h3>Actions rapides</h3>
+      <button class="btn-primary">Voir mon parcours sur 12 mois</button>
+      <button class="btn-secondary">Consulter les prérequis GS1</button>
+      <p class="note">Ces boutons basculent vers l’onglet « Mon parcours ».</p>
+    </div>
+  </div>
 </section>
