@@ -1,97 +1,85 @@
 // =============================================================
-// Navigation entre les écrans
+// Chargement dynamique des écrans
 // =============================================================
-
-// Tous les boutons de navigation
-const navButtons = document.querySelectorAll('nav button');
-// Tous les écrans
-const screens = document.querySelectorAll('.screen');
 
 /**
- * Affiche l'écran demandé et masque les autres
- * @param {string} screenName - nom logique de l'écran (accueil, parcours, competences, admin)
+ * Charge un écran HTML depuis /screens/<name>.html
+ * et l'injecte dans #screen-container
+ * @param {string} name - nom de l'écran (accueil, parcours, sami, etc.)
  */
-function showScreen(screenName) {
-  // Masquer tous les écrans
-  screens.forEach(s => s.classList.remove('active'));
+export async function loadScreen(name) {
+  const container = document.getElementById("screen-container");
 
-  // Afficher l'écran ciblé
-  const targetScreen = document.getElementById(`screen-${screenName}`);
-  if (targetScreen) {
-    targetScreen.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // Mettre à jour l'état actif des boutons nav
-  navButtons.forEach(b => b.classList.remove('active'));
-  const navBtn = document.querySelector(`nav button[data-screen="${screenName}"]`);
-  if (navBtn) navBtn.classList.add('active');
-
-  // Si on arrive sur l'écran Admin, on rafraîchit la liste
-  if (screenName === 'admin' && typeof refreshAdminList === 'function') {
-    refreshAdminList();
-  }
-}
-
-// Écouteurs sur les boutons de navigation
-navButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const target = btn.getAttribute('data-screen');
-    showScreen(target);
-  });
-});
-
-// =============================================================
-// Filtres de la timeline "Mon parcours"
-// =============================================================
-const filterButtons = document.querySelectorAll('.filter-btn');
-const events = document.querySelectorAll('.event');
-
-/**
- * Applique un filtre sur les événements du parcours
- * @param {string} filter - all | formation | terrain | autre
- */
-function applyFilter(filter) {
-  if (!filterButtons.length || !events.length) return;
-
-  // Mise à jour des boutons actifs
-  filterButtons.forEach(b => {
-    b.classList.toggle('active', b.getAttribute('data-filter') === filter);
-  });
-
-  // Affichage des événements filtrés
-  events.forEach(ev => {
-    if (filter === 'all') {
-      ev.style.display = 'block';
-    } else {
-      ev.style.display = ev.classList.contains(`event-${filter}`) ? 'block' : 'none';
+  try {
+    const response = await fetch(`screens/${name}.html`);
+    if (!response.ok) {
+      container.innerHTML = `<p style="color:red;">Erreur : écran "${name}" introuvable.</p>`;
+      return;
     }
-  });
+
+    const html = await response.text();
+    container.innerHTML = html;
+
+    // Exécuter un script spécifique à l'écran si nécessaire
+    runScreenScript(name);
+
+  } catch (err) {
+    container.innerHTML = `<p style="color:red;">Impossible de charger l'écran "${name}".</p>`;
+    console.error(err);
+  }
 }
 
-// Écouteurs sur les boutons de filtre
-filterButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    applyFilter(btn.getAttribute('data-filter'));
-  });
-});
-
 // =============================================================
-// Actions rapides de l'écran d'accueil
+// Scripts spécifiques à certains écrans
 // =============================================================
-const btnGoParcours = document.getElementById('btn-go-parcours');
-const btnGoParcoursFormation = document.getElementById('btn-go-parcours-formation');
 
-if (btnGoParcours) {
-  btnGoParcours.addEventListener('click', () => {
-    showScreen('parcours');
-    applyFilter('all');
-  });
+function runScreenScript(name) {
+  switch (name) {
+    case "parcours":
+      if (typeof initParcours === "function") initParcours();
+      break;
+
+    case "sami":
+      if (typeof initSami === "function") initSami();
+      break;
+
+    case "admin":
+      if (typeof initAdmin === "function") initAdmin();
+      break;
+
+    default:
+      // Aucun script spécifique
+      break;
+  }
 }
 
-if (btnGoParcoursFormation) {
-  btnGoParcoursFormation.addEventListener('click', () => {
-    showScreen('parcours');
-    applyFilter('formation');
+// =============================================================
+// Gestion des boutons de navigation
+// =============================================================
+
+export function initNavigation() {
+  const buttons = document.querySelectorAll("[data-screen]");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const screen = btn.dataset.screen;
+      loadScreen(screen);
+      setActiveButton(screen);
+    });
+  });
+
+  // Charger l'écran d'accueil au démarrage
+  loadScreen("accueil");
+  setActiveButton("accueil");
+}
+
+// =============================================================
+// Mise en surbrillance du bouton actif
+// =============================================================
+
+function setActiveButton(screen) {
+  const buttons = document.querySelectorAll("[data-screen]");
+  buttons.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.screen === screen);
   });
 }
