@@ -370,3 +370,69 @@ nav button.active {
   border-radius: 50%;
   border: 3px solid #003b72;
 }
+
+/* === Écran Accueil === */
+.screen-accueil {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  color: #222;
+}
+
+.screen-accueil h2 {
+  margin-bottom: 0.5rem;
+  color: #003366;
+}
+
+.screen-accueil .intro {
+  margin-bottom: 2rem;
+  font-style: italic;
+  color: #555;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+  color: #003366;
+  margin-bottom: 0.5rem;
+}
+
+.progress {
+  background: #e9ecef;
+  border-radius: 6px;
+  height: 12px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: #007bff;
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.quick-actions button {
+  background: #003366;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.quick-actions button:hover {
+  background: #0055a5;
+}
