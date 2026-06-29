@@ -249,3 +249,28 @@ nav button.active {
 .screen-accueil {
   position: relative;   /* nécessaire pour positionner le logo */
 }
+
+/* === Grille 2 colonnes pour étapes + actions === */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* === Checklist accueil === */
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+.checklist li {
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.checklist input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: #003b72; /* couleur bleue SNCF */
+}
