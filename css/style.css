@@ -1,4 +1,4 @@
-/* Reset et base */
+/* === Reset et base === */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
@@ -7,6 +7,7 @@ body {
   color: #333;
 }
 
+/* === Navigation === */
 nav {
   background-color: #003b72;
   padding: 10px 20px;
@@ -34,7 +35,7 @@ nav button.active {
   background-color: #005fa3;
 }
 
-/* Layout général */
+/* === Layout général === */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -53,7 +54,7 @@ nav button.active {
   display: block;
 }
 
-/* Boutons */
+/* === Boutons === */
 .btn-primary {
   background-color: #003b72;
   color: white;
@@ -82,293 +83,46 @@ nav button.active {
   background-color: #d0d0d0;
 }
 
-.btn-secondary.active {
-  background-color: #003b72;
-  color: white;
-}
-
-/* Cartes */
+/* === Cartes === */
 .card {
-  background: white;
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.card-block {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 15px;
-}
-
-/* --- NOUVEAU : mise en page en colonnes pour l'accueil --- */
-.card-flex {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* 3 colonnes égales */
-  gap: 20px;
-  align-items: flex-start;
-}
-
-/* Pour éviter que les blocs ne débordent */
-.card-flex .card-block {
-  min-width: 0;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .card h3 {
-  margin-top: 0;
-  color: #003b72;
+  color: #003366;
+  margin-bottom: 0.5rem;
 }
 
-/* Timeline */
-.filters-bar {
-  margin: 10px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.filters-bar span {
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-.legend {
-  margin-bottom: 10px;
-  font-size: 0.85rem;
-}
-
-.legend-item {
-  display: inline-block;
-  margin-right: 10px;
-  padding: 3px 6px;
-  border-radius: 10px;
-  color: #fff;
-}
-
-.legend-formation {
-  background-color: #00a88f;
-}
-
-.legend-stage {
-  background-color: #ff9800;
-}
-
-.legend-entretien {
-  background-color: #003b72;
-}
-
-.timeline {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 5px 0 10px 0;
-}
-
-.month-column {
-  min-width: 200px;
-  background: #fff;
-  border-radius: 4px;
-  padding: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.month-column h3 {
-  margin-top: 0;
-  font-size: 1rem;
-  color: #003b72;
-}
-
-.event {
-  background: #f5f5f5;
-  border-radius: 3px;
-  padding: 6px 8px;
-  margin-bottom: 8px;
-  border-left: 4px solid #ccc;
-  font-size: 0.9rem;
-}
-
-.event strong {
-  display: block;
-}
-
-.event-note {
-  display: block;
-  font-size: 0.8rem;
-  color: #555;
-  margin-top: 2px;
-}
-
-/* Couleurs selon type d'événement */
-.event-formation {
-  border-left-color: #00a88f;
-}
-
-.event-stage {
-  border-left-color: #ff9800;
-}
-
-.event-entretien {
-  border-left-color: #003b72;
-}
-
-/* Formulaires */
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.form-group {
-  flex: 1 1 220px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.85rem;
-  margin-bottom: 3px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 4px 6px;
-  font-size: 0.9rem;
-  box-sizing: border-box;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-/* Tableaux */
-.table-competences,
-.sami-competence-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 0.9rem;
-  background: #fff;
-}
-
-.table-competences th,
-.table-competences td,
-.sami-competence-table th,
-.sami-competence-table td {
-  border: 1px solid #ddd;
-  padding: 6px 8px;
-  vertical-align: top;
-}
-
-.table-competences th,
-.sami-competence-table th {
-  background: #f0f0f0;
-  text-align: left;
-}
-
-.table-competences tbody tr:nth-child(even) {
-  background: #fafafa;
-}
-
-/* Historique SAMI */
-.sami-history-card {
-  background: #f5f5f5;
-  padding: 8px 10px;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  border-left: 4px solid #003b72;
-}
-
-.sami-history-card h4 {
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-}
-
-/* Synthèse visuelle SAMI */
-.sami-synth-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.sami-synth-card {
-  flex: 1 1 220px;
-  background: #f5f5f5;
-  padding: 8px 10px;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.sami-synth-card h4 {
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-}
-
-.sami-synth-label {
-  margin: 4px 0 0 0;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-/* Barre segmentée S / A / M / I */
-.sami-synth-bar {
-  display: flex;
-  width: 100%;
-  height: 10px;
-  border-radius: 4px;
-  overflow: hidden;
-  background-color: #ddd;
-  margin-top: 4px;
-}
-
-.sami-synth-segment {
-  height: 100%;
-}
-
-/* Code couleur demandé */
-.seg-S {
-  background-color: #2e7d32;
-}
-
-.seg-A {
-  background-color: #1976d2;
-}
-
-.seg-M {
-  background-color: #fbc02d;
-}
-
-.seg-I {
-  background-color: #d32f2f;
-}
-
-/* Texte et utilitaires */
-.text-muted {
-  color: #666;
-}
-
-.small {
-  font-size: 0.8rem;
-}
-
-.hidden {
-  display: none;
-}
-
-/* --- Photo profil accueil --- */
-.profile-block {
+/* === Profil agent === */
+.profile {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.profile-pic {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+.profile-photo {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 3px solid #003b72;
+  border: 2px solid #003366;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.profile ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profile ul li {
+  margin-bottom: 0.3rem;
 }
 
 /* === Écran Accueil === */
@@ -389,20 +143,7 @@ nav button.active {
   color: #555;
 }
 
-.card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.card h3 {
-  color: #003366;
-  margin-bottom: 0.5rem;
-}
-
+/* === Barre de progression === */
 .progress {
   background: #e9ecef;
   border-radius: 6px;
@@ -416,6 +157,7 @@ nav button.active {
   transition: width 0.4s ease;
 }
 
+/* === Actions rapides === */
 .quick-actions {
   display: flex;
   gap: 1rem;
@@ -436,3 +178,8 @@ nav button.active {
 .quick-actions button:hover {
   background: #0055a5;
 }
+
+/* === Utilitaires === */
+.text-muted { color: #666; }
+.small { font-size: 0.8rem; }
+.hidden { display: none; }
