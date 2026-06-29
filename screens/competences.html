@@ -1,0 +1,161 @@
+<section>
+  <h2>Saisie d'une évaluation SAMI par GS</h2>
+
+  <p class="text-muted small">
+    Cet écran simule la reprise d’une évaluation transmise par les formateurs
+    (par module GS) : choix du GS, saisie des compétences évaluées et d’un
+    commentaire général.
+  </p>
+
+  <!-- 1. Informations générales -->
+  <div class="card">
+    <h3>1. Informations générales</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="sami-gs">Module évalué</label>
+        <select id="sami-gs">
+          <option value="">-- Choisir un module --</option>
+          <option value="GS1 - Tronc commun essais">GS1 - Tronc commun essais</option>
+          <option value="GS2 - Détection des circulations">GS2 - Détection des circulations</option>
+          <option value="GS3 - Enclenchements / logiques">GS3 - Enclenchements / logiques</option>
+          <option value="GS4 - Installations de sécurité">GS4 - Installations de sécurité</option>
+          <option value="GS5">GS5</option>
+          <option value="GS6">GS6</option>
+          <option value="GS7">GS7</option>
+          <option value="GS8">GS8</option>
+          <option value="GS9 / module final">GS9 / module final</option>
+          <option value="Autre">Autre formation / stage</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="sami-date">Date de l’évaluation</label>
+        <input type="date" id="sami-date">
+      </div>
+
+      <div class="form-group">
+        <label for="sami-evaluateur">Évaluateur (formateur / tuteur)</label>
+        <input type="text" id="sami-evaluateur" placeholder="Nom de l’évaluateur">
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Compétences évaluées -->
+  <div class="card">
+    <h3>2. Compétences évaluées (extrait de la grille SAMI)</h3>
+
+    <p class="text-muted small">
+      Pour la démo, on saisit les compétences librement. Dans l’outil final,
+      elles pourraient être pré-remplies à partir du référentiel GS.
+    </p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="sami-comp-intitule">Intitulé de la compétence évaluée</label>
+        <input type="text" id="sami-comp-intitule"
+               placeholder="Ex : Appliquer les règles de sécurité en situation d’essais">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="sami-comp-niv-vise">Niveau visé (S / A / M / I)</label>
+        <select id="sami-comp-niv-vise">
+          <option value="S">S – Satisfaisant</option>
+          <option value="A">A – Acceptable</option>
+          <option value="M">M – Moyen</option>
+          <option value="I">I – Insuffisant</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="sami-comp-niv-atteint">Niveau atteint</label>
+        <select id="sami-comp-niv-atteint">
+          <option value="S">S – Satisfaisant</option>
+          <option value="A">A – Acceptable</option>
+          <option value="M">M – Moyen</option>
+          <option value="I">I – Insuffisant</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-secondary" id="btn-add-competence">
+      Ajouter cette compétence à l’évaluation
+    </button>
+
+    <h4 style="margin-top:12px;">Compétences ajoutées pour cette évaluation</h4>
+
+    <table class="sami-competence-table" id="sami-competence-list">
+      <thead>
+        <tr>
+          <th>Compétence</th>
+          <th>Niveau visé</th>
+          <th>Niveau atteint</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- rempli par JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. Commentaire général -->
+  <div class="card">
+    <h3>3. Commentaire général de l’évaluation</h3>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="sami-commentaire">Commentaire global</label>
+        <textarea id="sami-commentaire" rows="4"
+                  placeholder="Synthèse de l’évaluation, points forts, points à consolider..."></textarea>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-save-sami">
+      Enregistrer l'évaluation (démo)
+    </button>
+
+    <p class="text-muted small">
+      Pour la démo, les évaluations sont enregistrées localement dans ce navigateur
+      (aucune sauvegarde en base réelle).
+    </p>
+  </div>
+
+  <!-- 4. Synthèse visuelle -->
+  <div class="card">
+    <h3>Synthèse visuelle des évaluations SAMI</h3>
+
+    <p class="text-muted small">
+      Vue par module : répartition des niveaux atteints (S, A, M, I).
+    </p>
+
+    <p class="text-muted small">
+      <span style="color:#2e7d32;font-weight:bold;">■ S</span>
+      <span style="color:#1976d2;font-weight:bold;margin-left:6px;">■ A</span>
+      <span style="color:#fbc02d;font-weight:bold;margin-left:6px;">■ M</span>
+      <span style="color:#d32f2f;font-weight:bold;margin-left:6px;">■ I</span>
+    </p>
+
+    <div id="sami-synthesis" class="sami-synth-grid">
+      <p class="text-muted small">Aucune évaluation saisie pour le moment.</p>
+    </div>
+  </div>
+
+  <!-- 5. Historique -->
+  <div class="card">
+    <h3>Historique / synthèse des évaluations (locales)</h3>
+
+    <p class="text-muted small">
+      Ces évaluations sont enregistrées dans le navigateur de ce poste (localStorage).
+    </p>
+
+    <div id="sami-history" class="sami-history">
+      <p class="text-muted small">Aucune évaluation saisie pour le moment.</p>
+    </div>
+
+    <button class="btn-secondary" id="btn-clear-sami" style="margin-top:8px;">
+      Effacer les évaluations de démo
+    </button>
+  </div>
+</section>
