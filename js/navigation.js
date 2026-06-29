@@ -1,5 +1,5 @@
 // =============================================================
-// Chargement dynamique des écrans
+// Chargement dynamique des écrans (robuste pour GitHub Pages)
 // =============================================================
 
 /**
@@ -10,10 +10,15 @@
 export async function loadScreen(name) {
   const container = document.getElementById("screen-container");
 
+  // Détection automatique du chemin de base (local ou GitHub Pages)
+  const basePath = window.location.pathname.includes("vision-essais")
+    ? "/vision-essais/"
+    : "/";
+
   try {
-    const response = await fetch(`screens/${name}.html`);
+    const response = await fetch(`${basePath}screens/${name}.html`);
     if (!response.ok) {
-      container.innerHTML = `<p style="color:red;">Erreur : écran "${name}" introuvable.</p>`;
+      container.innerHTML = `<p style="color:red;">Erreur : écran "${name}" introuvable (${response.status}).</p>`;
       return;
     }
 
@@ -25,7 +30,7 @@ export async function loadScreen(name) {
 
   } catch (err) {
     container.innerHTML = `<p style="color:red;">Impossible de charger l'écran "${name}".</p>`;
-    console.error(err);
+    console.error("Erreur de chargement :", err);
   }
 }
 
@@ -45,6 +50,10 @@ function runScreenScript(name) {
 
     case "admin":
       if (typeof initAdmin === "function") initAdmin();
+      break;
+
+    case "accueil":
+      if (typeof initAccueil === "function") initAccueil();
       break;
 
     default:
