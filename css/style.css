@@ -1,4 +1,4 @@
-/* === Reset et base === */
+/* === RESET & BASE === */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
@@ -7,7 +7,7 @@ body {
   color: #333;
 }
 
-/* === Navigation === */
+/* === NAVIGATION === */
 nav {
   background-color: #003b72;
   padding: 10px 20px;
@@ -35,7 +35,7 @@ nav button.active {
   background-color: #005fa3;
 }
 
-/* === Layout général === */
+/* === LAYOUT === */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -54,36 +54,14 @@ nav button.active {
   display: block;
 }
 
-/* === Boutons === */
-.btn-primary {
-  background-color: #003b72;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
+.screen-accueil {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  color: #222;
+  position: relative;
 }
 
-.btn-primary:hover {
-  background-color: #005fa3;
-}
-
-.btn-secondary {
-  background-color: #e0e0e0;
-  color: #333;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.btn-secondary:hover {
-  background-color: #d0d0d0;
-}
-
-/* === Cartes === */
+/* === CARTES === */
 .card {
   background: #fff;
   border: 1px solid #ddd;
@@ -98,7 +76,35 @@ nav button.active {
   margin-bottom: 0.5rem;
 }
 
-/* === Profil agent === */
+/* === BOUTONS === */
+.btn-primary,
+.btn-secondary {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background-color: #003b72;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #005fa3;
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #d0d0d0;
+}
+
+/* === PROFIL AGENT === */
 .profile {
   display: flex;
   align-items: center;
@@ -121,136 +127,8 @@ nav button.active {
   padding: 0;
 }
 
-.profile ul li {
-  margin-bottom: 0.3rem;
-}
-
-/* === Écran Accueil === */
-.screen-accueil {
-  padding: 2rem;
-  background-color: #f8f9fa;
-  color: #222;
-}
-
-.screen-accueil h2 {
-  margin-bottom: 0.5rem;
-  color: #003366;
-}
-
-.screen-accueil .intro {
-  margin-bottom: 2rem;
-  font-style: italic;
-  color: #555;
-}
-
-/* === Barre de progression === */
-.progress {
-  background: #e9ecef;
-  border-radius: 6px;
-  height: 12px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  background: #007bff;
-  height: 100%;
-  transition: width 0.4s ease;
-}
-
-/* === Actions rapides === */
-.quick-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.quick-actions button {
-  background: #003366;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.quick-actions button:hover {
-  background: #0055a5;
-}
-
-/* === Utilitaires === */
-.text-muted { color: #666; }
-.small { font-size: 0.8rem; }
-.hidden { display: none; }
-
-/* === Ajustement taille photo profil === */
-.profile {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.profile-photo {
-  width: 120px;      /* largeur fixe */
-  height: 120px;     /* hauteur fixe */
-  border-radius: 50%;
-  border: 2px solid #003366;
-  object-fit: cover;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-/* === Agent + Tuteur côte à côte === */
-.agent-tuteur-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* deux colonnes */
-  gap: 20px;
-  align-items: start;
-}
-
-/* === Profil agent (photo + infos) === */
-.profile {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.profile-photo {
-  width: 120px;      /* taille réduite */
-  height: 120px;
-  border-radius: 50%;
-  border: 2px solid #003366;
-  object-fit: cover;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-.profile ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.profile ul li {
-  margin-bottom: 0.3rem;
-}
-
-/* === Logo Vision Essais === */
-.logo-vision {
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  width: 110px;        /* taille réduite */
-  opacity: 0.95;
-  z-index: 10;
-}
-
-.screen-accueil {
-  position: relative;   /* nécessaire pour positionner le logo */
-}
-
-/* === Grille 2 colonnes pour étapes + actions === */
+/* === GRILLES === */
+.agent-tuteur-grid,
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -258,7 +136,7 @@ nav button.active {
   align-items: start;
 }
 
-/* === Checklist accueil === */
+/* === CHECKLIST === */
 .checklist {
   list-style: none;
   padding: 0;
@@ -272,5 +150,20 @@ nav button.active {
 
 .checklist input[type="checkbox"] {
   margin-right: 8px;
-  accent-color: #003b72; /* couleur bleue SNCF */
+  accent-color: #003b72;
 }
+
+/* === LOGO === */
+.logo-vision {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  width: 110px;
+  opacity: 0.95;
+  z-index: 10;
+}
+
+/* === UTILITAIRES === */
+.text-muted { color: #666; }
+.small { font-size: 0.8rem; }
+.hidden { display: none; }
