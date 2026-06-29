@@ -183,3 +183,20 @@ nav button.active {
 .text-muted { color: #666; }
 .small { font-size: 0.8rem; }
 .hidden { display: none; }
+
+/* === Ajustement taille photo profil === */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-photo {
+  width: 120px;      /* largeur fixe */
+  height: 120px;     /* hauteur fixe */
+  border-radius: 50%;
+  border: 2px solid #003366;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
