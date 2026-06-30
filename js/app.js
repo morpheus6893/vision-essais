@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       console.warn("Éléments accueil non trouvés, chargement différé.");
     }
-  }, 500);
+  }, 1500); // ✅ délai augmenté à 1,5 s pour GitHub Pages
 
   // Gestion de la connexion admin
   onAuthStateChanged(auth, async (user) => {
@@ -74,18 +74,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadScreen("login");
     }
   });
-
-  // Attache le bouton de connexion (évite l'erreur loginAdmin non défini)
-  const loginBtn = document.getElementById("login-btn");
-  if (loginBtn) loginBtn.addEventListener("click", loginAdmin);
 });
 
 // =============================================================
 // LOGIN ADMIN
 // =============================================================
 export function loginAdmin() {
-  const email = document.getElementById("login-email").value;
-  const pass = document.getElementById("login-pass").value;
+  const email = document.getElementById("login-email")?.value;
+  const pass = document.getElementById("login-pass")?.value;
+
+  if (!email || !pass) {
+    console.warn("Champs de connexion manquants.");
+    return;
+  }
 
   signInWithEmailAndPassword(auth, email, pass)
     .then(() => {
@@ -143,10 +144,10 @@ async function loadAgents() {
 
 // Ajouter un agent
 export async function addAgent() {
-  const nom = document.getElementById("agent-nom").value;
-  const unite = document.getElementById("agent-unite").value;
-  const poste = document.getElementById("agent-poste").value;
-  const session = document.getElementById("agent-session").value;
+  const nom = document.getElementById("agent-nom")?.value;
+  const unite = document.getElementById("agent-unite")?.value;
+  const poste = document.getElementById("agent-poste")?.value;
+  const session = document.getElementById("agent-session")?.value;
 
   await addDoc(collection(db, "agents"), {
     nom,
