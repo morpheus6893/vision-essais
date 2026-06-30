@@ -21,7 +21,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // =============================================================
-// Firebase – Configuration (ta vraie config)
+// Firebase – Configuration
 // =============================================================
 const firebaseConfig = {
   apiKey: "AIzaSyDejEzfctjZTiv1gLh25gRjKlUryTgEUdM",
@@ -32,7 +32,6 @@ const firebaseConfig = {
   appId: "1:541452723941:web:8e5e1c5c3df54d8a2f160c"
 };
 
-// Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -51,21 +50,15 @@ document.addEventListener("DOMContentLoaded", () => {
   initNavigation();
   initPdfImport();
 
-  // Protection automatique des écrans
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
       console.log("Admin connecté :", user.email);
 
-      // Charge l'écran admin
       loadScreen("admin");
-
-      // Charge les agents Firestore
       loadAgents();
 
     } else {
       console.log("Aucun admin connecté");
-
-      // Affiche l'écran login
       loadScreen("login");
     }
   });
@@ -104,12 +97,12 @@ export function logoutAdmin() {
 // Firestore – Gestion des agents
 // =============================================================
 
-// Charger les agents
+// Charger les agents dans l’admin
 async function loadAgents() {
   const querySnapshot = await getDocs(collection(db, "agents"));
   const tbody = document.querySelector("#admin-list tbody");
 
-  if (!tbody) return; // si admin.html pas encore chargé
+  if (!tbody) return;
 
   tbody.innerHTML = "";
 
@@ -144,7 +137,8 @@ export async function addAgent() {
     nom,
     unite,
     poste,
-    session
+    session,
+    photo: "../img/default.jpg" // sécurité si pas de photo
   });
 
   loadAgents();
@@ -157,7 +151,44 @@ export async function deleteAgent(id) {
 }
 
 // =============================================================
-// Import PDF (inchangé)
+// ACCUEIL – Chargement dynamique Firestore
+// =============================================================
+export async function loadAccueil() {
+  console.log("Chargement accueil dynamique…");
+
+  // 1) Lire le document config/activeAgent
+  const configDoc = await getDoc(doc(db, "config", "activeAgent"));
+  if (!configDoc.exists()) {
+    console.error("Document config/activeAgent introuvable");
+    return;
+  }
+
+  const agentId = configDoc.data().agentId;
+
+  // 2) Charger l’agent actif
+  const agentDoc = await getDoc(doc(db, "agents", agentId));
+  if (!agentDoc.exists()) {
+    console.error("Agent actif introuvable :", agentId);
+    return;
+  }
+
+  const agent = agentDoc.data();
+
+  // 3) Remplir l’accueil
+  document.getElementById("agent-nom").textContent = agent.nom;
+  document.getElementById("agent-unite").textContent = agent.unite;
+  document.getElementById("agent-poste").textContent = agent.poste;
+  document.getElementById("agent-session").textContent = agent.session;
+
+  // Correction du chemin photo
+  document.getElementById("agent-photo").src = agent.photo || "../img/default.jpg";
+
+  // Mois fictif (à améliorer plus tard)
+  document.getElementById("agent-mois").textContent = "1";
+}
+
+// =============================================================
+// Import PDF
 // =============================================================
 function initPdfImport() {
   const fileInput = document.getElementById("pdf-input");
@@ -189,7 +220,7 @@ function initPdfImport() {
 }
 
 // =============================================================
-// Extraction du texte d'un PDF via PDF.js
+// Extraction PDF via PDF.js
 // =============================================================
 async function extractPdfText(file) {
   const arrayBuffer = await file.arrayBuffer();
