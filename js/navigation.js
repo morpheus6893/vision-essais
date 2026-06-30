@@ -15,6 +15,7 @@ export async function loadScreen(name) {
     const html = await response.text();
     container.innerHTML = html;
 
+    // Exécute le script spécifique à l’écran
     runScreenScript(name);
 
   } catch (err) {
@@ -31,8 +32,13 @@ function runScreenScript(name) {
   switch (name) {
 
     case "accueil":
-      // Chargement dynamique du profil agent
-      if (typeof loadAccueil === "function") loadAccueil();
+      // ⏳ Attente pour garantir que le DOM est injecté avant le chargement Firestore
+      setTimeout(() => {
+        if (typeof loadAccueil === "function") {
+          console.log("Chargement différé de l’accueil depuis navigation.js…");
+          loadAccueil();
+        }
+      }, 1500);
       break;
 
     case "parcours":
@@ -50,7 +56,7 @@ function runScreenScript(name) {
     case "login":
       if (typeof initLogin === "function") initLogin();
 
-      // 🔥 CORRECTION CRITIQUE : attacher le bouton de connexion ici
+      // 🔹 Attache le bouton de connexion après injection du HTML
       const loginBtn = document.getElementById("login-btn");
       if (loginBtn && typeof loginAdmin === "function") {
         loginBtn.addEventListener("click", loginAdmin);
