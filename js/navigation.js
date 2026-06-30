@@ -29,6 +29,11 @@ export async function loadScreen(name) {
 
 function runScreenScript(name) {
   switch (name) {
+    case "accueil":
+      // 🔹 Chargement dynamique du profil agent
+      if (typeof loadAccueil === "function") loadAccueil();
+      break;
+
     case "parcours":
       if (typeof initParcours === "function") initParcours();
       break;
@@ -65,7 +70,6 @@ export function initNavigation() {
       // ⚠ Cas particulier : ADMIN → protégé par Firebase
       if (screen === "admin") {
         console.log("Accès admin demandé → Firebase gère l'autorisation");
-        // On ne charge pas l'écran ici : app.js décidera via onAuthStateChanged()
         return;
       }
 
