@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       console.warn("Éléments accueil non trouvés, chargement différé.");
     }
-  }, 1500); // délai augmenté pour GitHub Pages
+  }, 2000); // délai augmenté pour GitHub Pages
 
   // Gestion de la connexion admin
   onAuthStateChanged(auth, async (user) => {
