@@ -9,13 +9,15 @@
     <div class="card">
       <h3>Mon profil</h3>
       <div class="profile">
-        <img src="img/ANTOINE_Tristan.jpg" alt="Photo agent" class="profile-photo">
+        <!-- Photo dynamique -->
+        <img id="agent-photo" src="img/default.jpg" alt="Photo agent" class="profile-photo">
+
         <ul>
-          <li><strong>Nom :</strong> Tristan ANTOINE</li>
-          <li><strong>Unité :</strong> Essais Dijon</li>
-          <li><strong>Poste :</strong> Agent d’essais</li>
-          <li><strong>Session :</strong> 14 Bis</li>
-          <li><strong>Statut :</strong> Parcours en cours – 1 / 12 mois</li>
+          <li><strong>Nom :</strong> <span id="agent-nom"></span></li>
+          <li><strong>Unité :</strong> <span id="agent-unite"></span></li>
+          <li><strong>Poste :</strong> <span id="agent-poste"></span></li>
+          <li><strong>Session :</strong> <span id="agent-session"></span></li>
+          <li><strong>Statut :</strong> Parcours en cours – <span id="agent-mois"></span> / 12 mois</li>
         </ul>
       </div>
     </div>
