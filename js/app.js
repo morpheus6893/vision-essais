@@ -21,6 +21,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // =============================================================
+// PDF.js – Import (MANQUANT AVANT)
+// =============================================================
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs";
+
+// =============================================================
 // Firebase – Configuration
 // =============================================================
 const firebaseConfig = {
@@ -61,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       console.warn("Éléments accueil non trouvés, chargement différé.");
     }
-  }, 1500); // ✅ délai augmenté à 1,5 s pour GitHub Pages
+  }, 1500); // délai augmenté pour GitHub Pages
 
   // Gestion de la connexion admin
   onAuthStateChanged(auth, async (user) => {
@@ -154,7 +159,7 @@ export async function addAgent() {
     unite,
     poste,
     session,
-    photo: "img/default.jpg" // sécurité si pas de photo
+    photo: "img/default.jpg"
   });
 
   loadAgents();
@@ -189,7 +194,6 @@ export async function loadAccueil() {
 
     const agent = agentDoc.data();
 
-    // Remplissage des champs
     const nomEl = document.getElementById("agent-nom");
     const uniteEl = document.getElementById("agent-unite");
     const posteEl = document.getElementById("agent-poste");
@@ -207,7 +211,6 @@ export async function loadAccueil() {
     posteEl.textContent = agent.poste || "";
     sessionEl.textContent = agent.session || "";
 
-    // Avatar neutre si pas de photo
     const fallbackAvatar =
       "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><circle cx='75' cy='75' r='70' fill='%23ddd'/><text x='50%' y='55%' text-anchor='middle' font-size='20' fill='%23666'>Photo</text></svg>";
 
