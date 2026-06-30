@@ -1,0 +1,62 @@
+<section id="admin" class="screen">
+
+  <h2>Administration – Gestion des agents</h2>
+
+  <!-- Bouton déconnexion -->
+  <button class="btn-secondary" onclick="logoutAdmin()">Déconnexion</button>
+
+  <hr>
+
+  <!-- Formulaire d'ajout d'un agent -->
+  <div class="card">
+    <h3>Ajouter un agent</h3>
+
+    <div class="form-grid">
+      <div>
+        <label>Nom</label>
+        <input id="agent-nom" type="text" placeholder="Nom complet">
+      </div>
+
+      <div>
+        <label>Unité</label>
+        <input id="agent-unite" type="text" placeholder="Ex : Essais Dijon">
+      </div>
+
+      <div>
+        <label>Poste</label>
+        <input id="agent-poste" type="text" placeholder="Ex : Agent d’essais">
+      </div>
+
+      <div>
+        <label>Session</label>
+        <input id="agent-session" type="text" placeholder="Ex : 14 Bis">
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="addAgent()">Ajouter l’agent</button>
+  </div>
+
+  <hr>
+
+  <!-- Liste des agents -->
+  <div class="card">
+    <h3>Liste des agents enregistrés</h3>
+
+    <table id="admin-list" class="admin-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Unité</th>
+          <th>Poste</th>
+          <th>Session</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Rempli dynamiquement par app.js -->
+      </tbody>
+    </table>
+  </div>
+
+</section>
