@@ -29,8 +29,9 @@ export async function loadScreen(name) {
 
 function runScreenScript(name) {
   switch (name) {
+
     case "accueil":
-      // 🔹 Chargement dynamique du profil agent
+      // Chargement dynamique du profil agent
       if (typeof loadAccueil === "function") loadAccueil();
       break;
 
@@ -43,12 +44,17 @@ function runScreenScript(name) {
       break;
 
     case "admin":
-      // ⚠ L'accès admin est protégé par Firebase (app.js)
       if (typeof initAdmin === "function") initAdmin();
       break;
 
     case "login":
       if (typeof initLogin === "function") initLogin();
+
+      // 🔥 CORRECTION CRITIQUE : attacher le bouton de connexion ici
+      const loginBtn = document.getElementById("login-btn");
+      if (loginBtn && typeof loginAdmin === "function") {
+        loginBtn.addEventListener("click", loginAdmin);
+      }
       break;
 
     default:
@@ -67,13 +73,13 @@ export function initNavigation() {
     btn.addEventListener("click", () => {
       const screen = btn.dataset.screen;
 
-      // ⚠ Cas particulier : ADMIN → protégé par Firebase
+      // Cas particulier : ADMIN → protégé par Firebase
       if (screen === "admin") {
         console.log("Accès admin demandé → Firebase gère l'autorisation");
         return;
       }
 
-      // ⚠ Cas particulier : LOGIN → toujours accessible
+      // Cas particulier : LOGIN → toujours accessible
       if (screen === "login") {
         loadScreen("login");
         setActiveButton("login");
