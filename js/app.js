@@ -21,7 +21,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // =============================================================
-// PDF.js – Import (MANQUANT AVANT)
+// PDF.js – Import
 // =============================================================
 import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs";
 
@@ -58,15 +58,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Charge l’écran accueil au démarrage
   await loadScreen("accueil");
 
-  // Attends que le DOM soit prêt avant de remplir l’accueil
-  setTimeout(() => {
+  // 🔁 Relance automatique si le DOM n’est pas prêt
+  function tryLoadAccueil(retry = 0) {
     const nomEl = document.getElementById("agent-nom");
     if (nomEl) {
+      console.log("DOM prêt, chargement accueil…");
       loadAccueil();
+    } else if (retry < 3) {
+      console.warn(`Éléments accueil non trouvés, nouvelle tentative (${retry + 1})…`);
+      setTimeout(() => tryLoadAccueil(retry + 1), 1000);
     } else {
-      console.warn("Éléments accueil non trouvés, chargement différé.");
+      console.error("Impossible de charger l’accueil après plusieurs tentatives.");
     }
-  }, 2000); // délai augmenté pour GitHub Pages
+  }
+
+  // Première tentative après 2 secondes
+  setTimeout(() => tryLoadAccueil(), 2000);
 
   // Gestion de la connexion admin
   onAuthStateChanged(auth, async (user) => {
