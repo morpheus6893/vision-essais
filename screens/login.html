@@ -1,0 +1,33 @@
+<section id="login" class="screen-login">
+
+  <h2>Connexion administrateur</h2>
+
+  <p class="text-muted small">
+    Accès réservé aux administrateurs Vision Essais.
+  </p>
+
+  <!-- Champ email -->
+  <input 
+    id="login-email" 
+    type="email" 
+    placeholder="Adresse email"
+    autocomplete="username"
+  >
+
+  <!-- Champ mot de passe -->
+  <input 
+    id="login-pass" 
+    type="password" 
+    placeholder="Mot de passe"
+    autocomplete="current-password"
+  >
+
+  <!-- Bouton connexion -->
+  <button class="btn-primary" onclick="loginAdmin()">
+    Connexion
+  </button>
+
+  <!-- Message d'erreur -->
+  <p id="login-error" class="error"></p>
+
+</section>
