@@ -44,19 +44,26 @@ import { initNavigation, loadScreen } from "./navigation.js";
 // =============================================================
 // Initialisation globale
 // =============================================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   console.log("Vision Essais – Application initialisée");
 
   initNavigation();
   initPdfImport();
 
+  // Charge l’écran accueil au démarrage
+  await loadScreen("accueil");
+
+  // Petit délai pour laisser le HTML se charger avant Firestore
+  setTimeout(() => {
+    loadAccueil();
+  }, 300);
+
+  // Protection automatique des écrans
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       console.log("Admin connecté :", user.email);
-
       loadScreen("admin");
       loadAgents();
-
     } else {
       console.log("Aucun admin connecté");
       loadScreen("login");
@@ -156,35 +163,39 @@ export async function deleteAgent(id) {
 export async function loadAccueil() {
   console.log("Chargement accueil dynamique…");
 
-  // 1) Lire le document config/activeAgent
-  const configDoc = await getDoc(doc(db, "config", "activeAgent"));
-  if (!configDoc.exists()) {
-    console.error("Document config/activeAgent introuvable");
-    return;
+  try {
+    // 1) Lire le document config/activeAgent
+    const configDoc = await getDoc(doc(db, "config", "activeAgent"));
+    if (!configDoc.exists()) {
+      console.error("Document config/activeAgent introuvable");
+      return;
+    }
+
+    const agentId = configDoc.data().agentId;
+
+    // 2) Charger l’agent actif
+    const agentDoc = await getDoc(doc(db, "agents", agentId));
+    if (!agentDoc.exists()) {
+      console.error("Agent actif introuvable :", agentId);
+      return;
+    }
+
+    const agent = agentDoc.data();
+
+    // 3) Remplir l’accueil
+    document.getElementById("agent-nom").textContent = agent.nom || "";
+    document.getElementById("agent-unite").textContent = agent.unite || "";
+    document.getElementById("agent-poste").textContent = agent.poste || "";
+    document.getElementById("agent-session").textContent = agent.session || "";
+
+    // Chemin photo corrigé pour GitHub Pages
+    document.getElementById("agent-photo").src = agent.photo || "img/default.jpg";
+
+    // Mois fictif (à améliorer plus tard)
+    document.getElementById("agent-mois").textContent = "1";
+  } catch (err) {
+    console.error("Erreur lors du chargement de l’accueil :", err);
   }
-
-  const agentId = configDoc.data().agentId;
-
-  // 2) Charger l’agent actif
-  const agentDoc = await getDoc(doc(db, "agents", agentId));
-  if (!agentDoc.exists()) {
-    console.error("Agent actif introuvable :", agentId);
-    return;
-  }
-
-  const agent = agentDoc.data();
-
-  // 3) Remplir l’accueil
-  document.getElementById("agent-nom").textContent = agent.nom;
-  document.getElementById("agent-unite").textContent = agent.unite;
-  document.getElementById("agent-poste").textContent = agent.poste;
-  document.getElementById("agent-session").textContent = agent.session;
-
-  // Chemin photo CORRIGÉ pour GitHub Pages
-  document.getElementById("agent-photo").src = agent.photo || "img/default.jpg";
-
-  // Mois fictif (à améliorer plus tard)
-  document.getElementById("agent-mois").textContent = "1";
 }
 
 // =============================================================
