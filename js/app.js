@@ -50,10 +50,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   initNavigation();
   initPdfImport();
 
-  // Charge l’accueil au démarrage
+  // Charge l’écran accueil au démarrage
   await loadScreen("accueil");
-  setTimeout(() => loadAccueil(), 300);
 
+  // Attends que le DOM soit prêt avant de remplir l’accueil
+  setTimeout(() => {
+    const nomEl = document.getElementById("agent-nom");
+    if (nomEl) {
+      loadAccueil();
+    } else {
+      console.warn("Éléments accueil non trouvés, chargement différé.");
+    }
+  }, 500);
+
+  // Gestion de la connexion admin
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       console.log("Admin connecté :", user.email);
@@ -64,6 +74,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadScreen("login");
     }
   });
+
+  // Attache le bouton de connexion (évite l'erreur loginAdmin non défini)
+  const loginBtn = document.getElementById("login-btn");
+  if (loginBtn) loginBtn.addEventListener("click", loginAdmin);
 });
 
 // =============================================================
@@ -80,8 +94,8 @@ export function loginAdmin() {
       loadAgents();
     })
     .catch(() => {
-      document.getElementById("login-error").textContent =
-        "Identifiants incorrects";
+      const errEl = document.getElementById("login-error");
+      if (errEl) errEl.textContent = "Identifiants incorrects";
     });
 }
 
@@ -105,7 +119,6 @@ async function loadAgents() {
   const tbody = document.querySelector("#admin-list tbody");
 
   if (!tbody) return;
-
   tbody.innerHTML = "";
 
   querySnapshot.forEach((docSnap) => {
@@ -175,19 +188,30 @@ export async function loadAccueil() {
 
     const agent = agentDoc.data();
 
-    document.getElementById("agent-nom").textContent = agent.nom || "";
-    document.getElementById("agent-unite").textContent = agent.unite || "";
-    document.getElementById("agent-poste").textContent = agent.poste || "";
-    document.getElementById("agent-session").textContent = agent.session || "";
+    // Remplissage des champs
+    const nomEl = document.getElementById("agent-nom");
+    const uniteEl = document.getElementById("agent-unite");
+    const posteEl = document.getElementById("agent-poste");
+    const sessionEl = document.getElementById("agent-session");
+    const photoEl = document.getElementById("agent-photo");
+    const moisEl = document.getElementById("agent-mois");
 
-    // Si la photo n'existe pas → avatar neutre en base64
+    if (!nomEl || !uniteEl || !posteEl || !sessionEl || !photoEl || !moisEl) {
+      console.warn("Éléments accueil manquants dans le DOM.");
+      return;
+    }
+
+    nomEl.textContent = agent.nom || "";
+    uniteEl.textContent = agent.unite || "";
+    posteEl.textContent = agent.poste || "";
+    sessionEl.textContent = agent.session || "";
+
+    // Avatar neutre si pas de photo
     const fallbackAvatar =
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAA...";
-    
-    document.getElementById("agent-photo").src =
-      agent.photo ? agent.photo : fallbackAvatar;
+      "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><circle cx='75' cy='75' r='70' fill='%23ddd'/><text x='50%' y='55%' text-anchor='middle' font-size='20' fill='%23666'>Photo</text></svg>";
 
-    document.getElementById("agent-mois").textContent = "1";
+    photoEl.src = agent.photo || fallbackAvatar;
+    moisEl.textContent = "1";
 
   } catch (err) {
     console.error("Erreur lors du chargement de l’accueil :", err);
@@ -231,7 +255,6 @@ function initPdfImport() {
 // =============================================================
 async function extractPdfText(file) {
   const arrayBuffer = await file.arrayBuffer();
-
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   let fullText = "";
 
