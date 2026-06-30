@@ -138,7 +138,7 @@ export async function addAgent() {
     unite,
     poste,
     session,
-    photo: "../img/default.jpg" // sécurité si pas de photo
+    photo: "img/default.jpg" // sécurité si pas de photo
   });
 
   loadAgents();
@@ -180,8 +180,8 @@ export async function loadAccueil() {
   document.getElementById("agent-poste").textContent = agent.poste;
   document.getElementById("agent-session").textContent = agent.session;
 
-  // Correction du chemin photo
-  document.getElementById("agent-photo").src = agent.photo || "../img/default.jpg";
+  // Chemin photo CORRIGÉ pour GitHub Pages
+  document.getElementById("agent-photo").src = agent.photo || "img/default.jpg";
 
   // Mois fictif (à améliorer plus tard)
   document.getElementById("agent-mois").textContent = "1";
