@@ -2,6 +2,7 @@
 // Firebase – Imports
 // =============================================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import { 
   getAuth, 
   signInWithEmailAndPassword, 
@@ -15,21 +16,23 @@ import {
   getDocs, 
   addDoc, 
   deleteDoc, 
-  doc 
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // =============================================================
-// Firebase – Configuration (à remplacer par la tienne)
+// Firebase – Configuration (ta vraie config)
 // =============================================================
 const firebaseConfig = {
-  apiKey: "XXX",
-  authDomain: "XXX",
-  projectId: "XXX",
-  storageBucket: "XXX",
-  messagingSenderId: "XXX",
-  appId: "XXX"
+  apiKey: "AIzaSyDejEzfctjZTiv1gLh25gRjKlUryTgEUdM",
+  authDomain: "livret-essais.firebaseapp.com",
+  projectId: "livret-essais",
+  storageBucket: "livret-essais.firebasestorage.app",
+  messagingSenderId: "541452723941",
+  appId: "1:541452723941:web:8e5e1c5c3df54d8a2f160c"
 };
 
+// Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -37,7 +40,7 @@ const db = getFirestore(app);
 // =============================================================
 // Navigation
 // =============================================================
-import { initNavigation, showScreen } from "./navigation.js";
+import { initNavigation, loadScreen } from "./navigation.js";
 
 // =============================================================
 // Initialisation globale
@@ -52,11 +55,18 @@ document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       console.log("Admin connecté :", user.email);
-      showScreen("admin");   // accès admin
-      loadAgents();          // charge les agents depuis Firestore
+
+      // Charge l'écran admin
+      loadScreen("admin");
+
+      // Charge les agents Firestore
+      loadAgents();
+
     } else {
       console.log("Aucun admin connecté");
-      showScreen("login");   // écran login
+
+      // Affiche l'écran login
+      loadScreen("login");
     }
   });
 });
@@ -71,7 +81,8 @@ export function loginAdmin() {
   signInWithEmailAndPassword(auth, email, pass)
     .then(() => {
       console.log("Connexion réussie");
-      showScreen("admin");
+      loadScreen("admin");
+      loadAgents();
     })
     .catch(() => {
       document.getElementById("login-error").textContent =
@@ -85,7 +96,7 @@ export function loginAdmin() {
 export function logoutAdmin() {
   signOut(auth).then(() => {
     console.log("Déconnexion réussie");
-    showScreen("login");
+    loadScreen("login");
   });
 }
 
