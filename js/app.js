@@ -124,7 +124,7 @@ export function logoutAdmin() {
 }
 
 // =============================================================
-// ACCUEIL – Chargement dynamique Firestore
+// ACCUEIL – Chargement dynamique Firestore (Agent + Tuteur)
 // =============================================================
 export async function loadAccueil() {
   try {
@@ -137,6 +137,7 @@ export async function loadAccueil() {
 
     const agent = agentDoc.data();
 
+    // --- 1. Éléments de l'Agent ---
     const nomEl = document.getElementById("agent-nom");
     const uniteEl = document.getElementById("agent-unite");
     const posteEl = document.getElementById("agent-poste");
@@ -150,6 +151,17 @@ export async function loadAccueil() {
     if (sessionEl) sessionEl.textContent = agent.session || "";
     if (photoEl) photoEl.src = agent.photo || "img/default.jpg";
     if (moisEl) moisEl.textContent = "1";
+
+    // --- 2. Éléments du Tuteur (Nouveau !) ---
+    const tuteurNomEl = document.getElementById("tuteur-nom");
+    const tuteurFonctionEl = document.getElementById("tuteur-fonction");
+    const tuteurTelEl = document.getElementById("tuteur-tel");
+    const tuteurMailEl = document.getElementById("tuteur-mail");
+
+    if (tuteurNomEl) tuteurNomEl.textContent = agent.tuteurNom || "Non renseigné";
+    if (tuteurFonctionEl) tuteurFonctionEl.textContent = agent.tuteurFonction || "";
+    if (tuteurTelEl) tuteurTelEl.textContent = agent.tuteurTel || "";
+    if (tuteurMailEl) tuteurMailEl.textContent = agent.tuteurMail || "";
 
   } catch (err) {
     console.error("Erreur lors du chargement de l’accueil :", err);
