@@ -47,11 +47,16 @@ function runScreenScript(name) {
       break;
 
     case "login":
-      console.log("Écran Login injecté -> Liaison du bouton de connexion");
-      // Liaison dynamique avec la fonction loginAdmin de app.js
-      const btnLogin = document.getElementById("btn-login-submit");
-      if (btnLogin) {
-        btnLogin.addEventListener("click", async () => {
+      console.log("Écran Login injecté -> Liaison du formulaire de connexion");
+      
+      // Correction ici : On écoute le submit du formulaire plutôt que le clic du bouton
+      const loginForm = document.getElementById("login-form");
+      if (loginForm) {
+        loginForm.addEventListener("submit", async (event) => {
+          // Empêche le rechargement sauvage de la page par le navigateur
+          event.preventDefault(); 
+          
+          console.log("Formulaire soumis -> Appel Firebase Auth");
           const { loginAdmin } = await import("./app.js?v=2");
           loginAdmin();
         });
