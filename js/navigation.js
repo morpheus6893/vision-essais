@@ -47,7 +47,14 @@ function runScreenScript(name) {
       break;
 
     case "sami":
-      if (typeof initSami === "function") initSami();
+      console.log("Écran SAMI injecté -> Chargement du script analytique");
+      import("./sami.js")
+        .then(module => {
+          if (typeof module.initSami === "function") {
+            module.initSami();
+          }
+        })
+        .catch(err => console.error("Erreur lors de l'initialisation du module SAMI :", err));
       break;
 
     case "admin":
