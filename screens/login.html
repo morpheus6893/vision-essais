@@ -1,33 +1,35 @@
 <section id="login" class="screen-login">
 
-  <h2>Connexion administrateur</h2>
+  <h2>Connexion</h2>
 
   <p class="text-muted small">
-    Accès réservé aux administrateurs Vision Essais.
+    Accès sécurisé – Veuillez vous connecter pour accéder au Livret Digitalisé Vision Essais.
   </p>
 
-  <!-- Champ email -->
-  <input 
-    id="login-email" 
-    type="email" 
-    placeholder="Adresse email"
-    autocomplete="username"
-  >
+  <form id="login-form" onsubmit="event.preventDefault();">
+    
+    <input 
+      id="login-email" 
+      type="email" 
+      placeholder="Adresse email (ex: prenom.nom@reseau.sncf.fr)"
+      autocomplete="username"
+      required
+    >
 
-  <!-- Champ mot de passe -->
-  <input 
-    id="login-pass" 
-    type="password" 
-    placeholder="Mot de passe"
-    autocomplete="current-password"
-  >
+    <input 
+      id="login-pass" 
+      type="password" 
+      placeholder="Mot de passe"
+      autocomplete="current-password"
+      required
+    >
 
-  <!-- Bouton connexion -->
-  <button id="login-btn" class="btn-primary">
-    Connexion
-  </button>
+    <p id="login-error" class="error"></p>
 
-  <!-- Message d'erreur -->
-  <p id="login-error" class="error"></p>
+    <button type="submit" id="btn-login-submit" class="btn-primary" style="width: 100%; margin-top: 10px;">
+      Connexion
+    </button>
+    
+  </form>
 
 </section>
