@@ -80,12 +80,9 @@ function runScreenScript(name) {
 // =============================================================
 
 export function initNavigation() {
-  // 1. On écoute les clics sur la barre de navigation principale
-  const navButtons = document.querySelectorAll("nav [data-screen], .navbar [data-screen]"); // S'adapte à ta structure de menu
-  
-  // Si tu utilises une autre structure, on peut aussi écouter de manière globale sur toute la page :
+  // On écoute TOUS les clics sur la page de manière globale
   document.addEventListener("click", (event) => {
-    // On cherche si l'élément cliqué (ou l'un de ses parents) a un attribut data-screen
+    // On vérifie si l'élément cliqué (ou l'un de ses parents directs) a un attribut data-screen
     const btn = event.target.closest("[data-screen]");
     
     if (btn) {
@@ -96,15 +93,20 @@ export function initNavigation() {
       setActiveButton(screen);
     }
   });
+
+  // Au premier chargement du site, on active visuellement le bouton "accueil" dans le menu
+  setActiveButton("accueil");
 }
 
 // =============================================================
-// Mise en surbrillance du bouton actif
+// Mise en surbrillance du bouton actif dans le menu du haut
 // =============================================================
 
 function setActiveButton(screen) {
-  const buttons = document.querySelectorAll("[data-screen]");
-  buttons.forEach(btn => {
+  // On cible uniquement les boutons situés dans la barre de navigation du haut
+  const menuButtons = document.querySelectorAll("nav [data-screen], .navbar [data-screen], header [data-screen]");
+  
+  menuButtons.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.screen === screen);
   });
 }
