@@ -29,15 +29,9 @@ export async function loadScreen(name) {
 
 function runScreenScript(name) {
   switch (name) {
-
     case "accueil":
-      // ⏳ Attente pour garantir que le DOM est injecté avant le chargement Firestore
-      setTimeout(() => {
-        if (typeof loadAccueil === "function") {
-          console.log("Chargement différé de l’accueil depuis navigation.js…");
-          loadAccueil();
-        }
-      }, 1500);
+      // Le chargement des données Firebase se fait maintenant via tryLoadAccueil() dans app.js
+      console.log("Écran Accueil injecté.");
       break;
 
     case "parcours":
@@ -54,12 +48,6 @@ function runScreenScript(name) {
 
     case "login":
       if (typeof initLogin === "function") initLogin();
-
-      // Attache le bouton de connexion après injection du HTML
-      const loginBtn = document.getElementById("login-btn");
-      if (loginBtn && typeof loginAdmin === "function") {
-        loginBtn.addEventListener("click", loginAdmin);
-      }
       break;
 
     default:
@@ -78,27 +66,21 @@ export function initNavigation() {
     btn.addEventListener("click", () => {
       const screen = btn.dataset.screen;
 
-      // Cas particulier : ADMIN → protégé par Firebase
+      // Si l'utilisateur clique sur Admin, on l'envoie vers l'écran de login
       if (screen === "admin") {
-        console.log("Accès admin demandé → Firebase gère l'autorisation");
-        return;
-      }
-
-      // Cas particulier : LOGIN → toujours accessible
-      if (screen === "login") {
+        console.log("Accès admin demandé -> Redirection login");
         loadScreen("login");
-        setActiveButton("login");
+        setActiveButton("admin");
         return;
       }
 
-      // Navigation classique
+      // Navigation classique pour le reste
       loadScreen(screen);
       setActiveButton(screen);
     });
   });
 
-  // ❌ On ne charge plus automatiquement l’accueil ici
-  // ✔ On laisse app.js gérer le premier chargement
+  // On active visuellement le bouton accueil au démarrage
   setActiveButton("accueil");
 }
 
