@@ -370,4 +370,24 @@ body {
     align-items: flex-start;
     gap: 5px;
   }
+
+  .drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.file-label {
+  color: #0056b3;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+}
+.upload-status {
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
 }
