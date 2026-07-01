@@ -30,12 +30,12 @@ export async function loadScreen(name) {
 function runScreenScript(name) {
   switch (name) {
     case "accueil":
-      // Le chargement des données Firebase se fait maintenant via tryLoadAccueil() dans app.js
       console.log("Écran Accueil injecté.");
       break;
 
     case "parcours":
-      if (typeof initParcours === "function") initParcours();
+      console.log("Écran Parcours injecté -> Activation des filtres");
+      initParcoursFilters(); // <-- ACTIVE LES FILTRES ICI
       break;
 
     case "sami":
@@ -66,7 +66,6 @@ export function initNavigation() {
     btn.addEventListener("click", () => {
       const screen = btn.dataset.screen;
 
-      // Si l'utilisateur clique sur Admin, on l'envoie vers l'écran de login
       if (screen === "admin") {
         console.log("Accès admin demandé -> Redirection login");
         loadScreen("login");
@@ -74,13 +73,11 @@ export function initNavigation() {
         return;
       }
 
-      // Navigation classique pour le reste
       loadScreen(screen);
       setActiveButton(screen);
     });
   });
 
-  // On active visuellement le bouton accueil au démarrage
   setActiveButton("accueil");
 }
 
@@ -92,5 +89,34 @@ function setActiveButton(screen) {
   const buttons = document.querySelectorAll("[data-screen]");
   buttons.forEach(btn => {
     btn.classList.toggle("active", btn.dataset.screen === screen);
+  });
+}
+
+// =============================================================
+// Fonction de filtrage pour l'écran Parcours
+// =============================================================
+function initParcoursFilters() {
+  const filters = document.querySelectorAll(".btn-filter");
+  const items = document.querySelectorAll(".timeline-item");
+
+  filters.forEach(button => {
+    button.addEventListener("click", () => {
+      filters.forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      const filterValue = button.dataset.filter;
+
+      items.forEach(item => {
+        if (filterValue === "all") {
+          item.style.display = "block";
+        } else {
+          if (item.classList.contains(`filter-${filterValue}`)) {
+            item.style.display = "block";
+          } else {
+            item.style.display = "none";
+          }
+        }
+      });
+    });
   });
 }
