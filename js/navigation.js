@@ -35,7 +35,7 @@ function runScreenScript(name) {
 
     case "parcours":
       console.log("Écran Parcours injecté -> Activation des filtres");
-      initParcoursFilters(); // <-- ACTIVE LES FILTRES ICI
+      initParcoursFilters();
       break;
 
     case "sami":
@@ -47,7 +47,15 @@ function runScreenScript(name) {
       break;
 
     case "login":
-      if (typeof initLogin === "function") initLogin();
+      console.log("Écran Login injecté -> Liaison du bouton de connexion");
+      // Liaison dynamique avec la fonction loginAdmin de app.js
+      const btnLogin = document.getElementById("btn-login-submit");
+      if (btnLogin) {
+        btnLogin.addEventListener("click", async () => {
+          const { loginAdmin } = await import("./app.js?v=2");
+          loginAdmin();
+        });
+      }
       break;
 
     default:
@@ -65,20 +73,12 @@ export function initNavigation() {
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
       const screen = btn.dataset.screen;
-
-      if (screen === "admin") {
-        console.log("Accès admin demandé -> Redirection login");
-        loadScreen("login");
-        setActiveButton("admin");
-        return;
-      }
-
+      
+      // L'authentification globale gère déjà la sécurité, on charge l'écran demandé directement
       loadScreen(screen);
       setActiveButton(screen);
     });
   });
-
-  setActiveButton("accueil");
 }
 
 // =============================================================
