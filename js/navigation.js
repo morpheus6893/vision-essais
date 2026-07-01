@@ -30,7 +30,15 @@ export async function loadScreen(name) {
 function runScreenScript(name) {
   switch (name) {
     case "accueil":
-      console.log("Écran Accueil injecté.");
+      console.log("Écran Accueil injecté -> Récupération des données de l'agent...");
+      // Rechargement des données dynamiques pour éviter le retour au modèle par défaut
+      import("./app.js?v=2")
+        .then(module => {
+          if (typeof module.loadAccueil === "function") {
+            module.loadAccueil();
+          }
+        })
+        .catch(err => console.error("Erreur lors de la récupération de loadAccueil :", err));
       break;
 
     case "parcours":
@@ -49,7 +57,6 @@ function runScreenScript(name) {
     case "login":
       console.log("Écran Login injecté -> Liaison du formulaire de connexion");
       
-      // Correction ici : On écoute le submit du formulaire plutôt que le clic du bouton
       const loginForm = document.getElementById("login-form");
       if (loginForm) {
         loginForm.addEventListener("submit", async (event) => {
