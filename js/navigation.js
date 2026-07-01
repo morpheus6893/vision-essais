@@ -76,20 +76,25 @@ function runScreenScript(name) {
 }
 
 // =============================================================
-// Navigation principale
+// Navigation principale et globale
 // =============================================================
 
 export function initNavigation() {
-  const buttons = document.querySelectorAll("[data-screen]");
-
-  buttons.forEach(btn => {
-    btn.addEventListener("click", () => {
+  // 1. On écoute les clics sur la barre de navigation principale
+  const navButtons = document.querySelectorAll("nav [data-screen], .navbar [data-screen]"); // S'adapte à ta structure de menu
+  
+  // Si tu utilises une autre structure, on peut aussi écouter de manière globale sur toute la page :
+  document.addEventListener("click", (event) => {
+    // On cherche si l'élément cliqué (ou l'un de ses parents) a un attribut data-screen
+    const btn = event.target.closest("[data-screen]");
+    
+    if (btn) {
       const screen = btn.dataset.screen;
+      console.log(`Navigation globale déclenchée vers : ${screen}`);
       
-      // L'authentification globale gère déjà la sécurité, on charge l'écran demandé directement
       loadScreen(screen);
       setActiveButton(screen);
-    });
+    }
   });
 }
 
