@@ -44,7 +44,7 @@ const db = getFirestore(app);
 // =============================================================
 // Navigation
 // =============================================================
-import { initNavigation, loadScreen } from "./navigation.js";
+import { initNavigation, loadScreen } from "./navigation.js?v=2";
 
 // =============================================================
 // Initialisation globale
