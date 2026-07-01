@@ -52,38 +52,38 @@ import { initNavigation, loadScreen } from "./navigation.js";
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Vision Essais – Application initialisée");
 
+  // 1. Initialise les éléments de base
   initNavigation();
   initPdfImport();
 
-  // Charge l’écran accueil au démarrage
+  // 2. Charge l’écran d'accueil au démarrage
   await loadScreen("accueil");
 
-  // 🔁 Relance automatique si le DOM n’est pas prêt
+  // 3. Tente de charger les données Firestore de l'agent actif
+  tryLoadAccueil();
+
+  // 🔁 Fonction de relance automatique si le DOM de l'accueil prend du temps à s'injecter
   function tryLoadAccueil(retry = 0) {
     const nomEl = document.getElementById("agent-nom");
     if (nomEl) {
-      console.log("DOM prêt, chargement accueil…");
+      console.log("DOM prêt, chargement des données de l'accueil…");
       loadAccueil();
-    } else if (retry < 3) {
+    } else if (retry < 5) {
       console.warn(`Éléments accueil non trouvés, nouvelle tentative (${retry + 1})…`);
-      setTimeout(() => tryLoadAccueil(retry + 1), 1000);
+      setTimeout(() => tryLoadAccueil(retry + 1), 500);
     } else {
       console.error("Impossible de charger l’accueil après plusieurs tentatives.");
     }
   }
 
-  // Première tentative après 2 secondes
-  setTimeout(() => tryLoadAccueil(), 2000);
-
-  // Gestion de la connexion admin
+  // 4. Gestion de l'état de connexion (uniquement pour l'affichage de la zone admin)
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       console.log("Admin connecté :", user.email);
-      loadScreen("admin");
-      loadAgents();
+      // On ne force plus loadScreen("admin") ici pour éviter d'écraser l'accueil au démarrage.
+      // Le changement d'écran se fera quand l'utilisateur cliquera sur le menu.
     } else {
-      console.log("Aucun admin connecté");
-      loadScreen("login");
+      console.log("Aucun admin connecté (Mode agent/invité)");
     }
   });
 });
