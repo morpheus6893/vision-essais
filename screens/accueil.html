@@ -1,19 +1,18 @@
 <section class="screen-accueil">
+  
   <h2>Tableau de bord – Agent d’essais</h2>
   <img src="img/Logo_Vision_Essais.png" alt="Logo Vision Essais" class="logo-vision">
 
-  <!-- Bloc Agent + Tuteur côte à côte -->
+
   <div class="agent-tuteur-grid">
 
-    <!-- Profil agent -->
     <div class="card">
       <h3>Mon profil</h3>
       <div class="profile">
-        <!-- Photo dynamique -->
         <img id="agent-photo" src="img/default.jpg" alt="Photo agent" class="profile-photo">
 
         <ul>
-          <li><strong>Nom :</strong> <span id="agent-nom"></span></li>
+          <li><strong>Nom :</strong> <span id="agent-nom">Chargement...</span></li>
           <li><strong>Unité :</strong> <span id="agent-unite"></span></li>
           <li><strong>Poste :</strong> <span id="agent-poste"></span></li>
           <li><strong>Session :</strong> <span id="agent-session"></span></li>
@@ -22,14 +21,13 @@
       </div>
     </div>
 
-    <!-- Tuteur -->
     <div class="card">
       <h3>Mon tuteur</h3>
       <ul>
-        <li><strong>Nom :</strong> CONREUR Loïc</li>
-        <li><strong>Fonction :</strong> Agent d’essais confirmé</li>
-        <li><strong>Tél :</strong> 06 00 00 00 00</li>
-        <li><strong>Mail :</strong> loic.conreur1@reseau.sncf.fr</li>
+        <li><strong>Nom :</strong> <span id="tuteur-nom">Chargement...</span></li>
+        <li><strong>Fonction :</strong> <span id="tuteur-fonction"></span></li>
+        <li><strong>Tél :</strong> <span id="tuteur-tel"></span></li>
+        <li><strong>Mail :</strong> <span id="tuteur-mail"></span></li>
       </ul>
       <p class="note">
         Le tuteur prépare ton arrivée, organise les séquences de travail,
@@ -39,7 +37,7 @@
 
   </div>
 
-  <!-- Jalons -->
+
   <div class="card">
     <h3>Jalons d’intégration</h3>
     <ul>
@@ -52,8 +50,9 @@
     </ul>
   </div>
 
-  <!-- Prochaines étapes + Actions rapides côte à côte -->
+
   <div class="grid-2">
+    
     <div class="card">
       <h3>Prochaines étapes (selon calendrier Session 14 Bis)</h3>
       <ul>
@@ -66,14 +65,15 @@
     <div class="card">
       <h3>Actions rapides</h3>
       <div class="quick-actions">
-        <button class="btn-primary">Voir mon parcours sur 12 mois</button>
-        <button class="btn-secondary">Consulter les prérequis GS1</button>
+        <button class="btn-primary" data-screen="parcours">Voir mon parcours sur 12 mois</button>
+        <button class="btn-secondary" data-screen="parcours">Consulter les prérequis GS1</button>
       </div>
       <p class="note">Ces boutons basculent vers l’onglet « Mon parcours ».</p>
     </div>
+    
   </div>
 
-  <!-- Checklist d’accueil -->
+
   <div class="card">
     <h3>Checklist d’accueil (2–6 Septembre 2024)</h3>
 
