@@ -1,174 +1,102 @@
-<section>
+<section class="screen-parcours">
   <h2>Mon parcours sur 12 mois – Session 14 Bis</h2>
+  <p class="subtitle">Vue globale de ton parcours d’agent d’essais : formations GS, stages et entretiens clés.</p>
 
-  <p class="text-muted small">
-    Vue globale de mon parcours d’agent d’essais : formations GS, stages et entretiens clés.
-  </p>
-
-  <!-- Barre de filtres -->
-  <div class="filters-bar">
+  <div class="filter-container">
     <span>Filtrer :</span>
-    <button class="btn-secondary filter-btn active" data-filter="all">Tout</button>
-    <button class="btn-secondary filter-btn" data-filter="formation">Formations GS</button>
-    <button class="btn-secondary filter-btn" data-filter="stage">Stages</button>
-    <button class="btn-secondary filter-btn" data-filter="entretien">Entretiens / bilans</button>
+    <button class="btn-filter active" data-filter="all">Tout</button>
+    <button class="btn-filter" data-filter="gs">Formations GS</button>
+    <button class="btn-filter" data-filter="stage">Stages</button>
+    <button class="btn-filter" data-filter="bilan">Entretiens / bilans</button>
   </div>
 
-  <!-- Légende -->
-  <div class="legend">
-    <span class="legend-item legend-formation">Formations GS</span>
-    <span class="legend-item legend-stage">Stages</span>
-    <span class="legend-item legend-entretien">Entretiens / bilans</span>
-  </div>
-
-  <!-- Timeline 12 mois -->
   <div class="timeline">
-
-    <!-- Septembre M0 -->
-    <div class="month-column">
-      <h3>Sept. 2024</h3>
-
-      <div class="event event-entretien">
-        <strong>J0 – Arrivée</strong>
-        02/09 – Accueil unité & tuteur
-        <span class="event-note">Prise de poste, présentation UP Essais</span>
-      </div>
-
-      <div class="event event-formation">
-        <strong>GS1 – Tronc commun essais</strong>
-        09 → 13/09
-        <span class="event-note">Bases métier, sécurité, organisation des essais</span>
-      </div>
-
-      <div class="event event-stage">
-        <strong>Immersion INFRAPOLE</strong>
-        16 → 27/09
-        <span class="event-note">Découverte maintenance infra et interlocuteurs terrain</span>
+    
+    <div class="timeline-month">Septembre 2024</div>
+    
+    <div class="timeline-item filter-bilan">
+      <div class="timeline-badge badge-bilan">J0</div>
+      <div class="timeline-content">
+        <h4>Arrivée <span class="date">02/09/2024</span></h4>
+        <p>Accueil unité & tuteur. Prise de poste, présentation UP Essais.</p>
       </div>
     </div>
 
-    <!-- Octobre M1 -->
-    <div class="month-column">
-      <h3>Oct. 2024</h3>
-
-      <div class="event event-formation">
-        <strong>GS2 – Détection des circulations</strong>
-        30/09 → 04/10
-        <span class="event-note">Signalisation, circuits de voie, principes de détection</span>
-      </div>
-
-      <div class="event event-entretien">
-        <strong>Point d’intégration J+15</strong>
-        Semaine du 07/10
-        <span class="event-note">Retour sur l’accueil, vie d’équipe, premières difficultés</span>
-      </div>
-
-      <div class="event event-stage">
-        <strong>Stage terrain UP Essais</strong>
-        2e quinzaine
-        <span class="event-note">Observation d’essais en situation réelle</span>
+    <div class="timeline-item filter-gs">
+      <div class="timeline-badge badge-gs">GS1</div>
+      <div class="timeline-content">
+        <h4>Tronc commun essais <span class="date">09/09 → 13/09/2024</span></h4>
+        <p>Bases métier, sécurité, organisation des essais.</p>
       </div>
     </div>
 
-    <!-- Novembre M2 -->
-    <div class="month-column">
-      <h3>Nov. 2024</h3>
-
-      <div class="event event-formation">
-        <strong>GS3 – Enclenchements / logiques</strong>
-        1re quinzaine
-        <span class="event-note">Principes d’enclenchement, sécurité des itinéraires</span>
-      </div>
-
-      <div class="event event-stage">
-        <strong>Stage EIC</strong>
-        2e quinzaine
-        <span class="event-note">Organisation circulation, relations Essais / Exploitation</span>
+    <div class="timeline-item filter-stage">
+      <div class="timeline-badge badge-stage">Stage</div>
+      <div class="timeline-content">
+        <h4>Immersion INFRAPOLE <span class="date">16/09 → 27/09/2024</span></h4>
+        <p>Découverte maintenance infra et interlocuteurs terrain.</p>
       </div>
     </div>
 
-    <!-- Décembre M3 -->
-    <div class="month-column">
-      <h3>Déc. 2024</h3>
+    <div class="timeline-month">Octobre 2024</div>
 
-      <div class="event event-entretien">
-        <strong>Bilan 3 mois</strong>
-        Semaine du 09/12
-        <span class="event-note">Retour sur comportement, sécurité, prérequis techniques</span>
-      </div>
-
-      <div class="event event-formation">
-        <strong>GS4 – Installations de sécurité</strong>
-        Décembre
-        <span class="event-note">Approfondissement installations de sécurité</span>
+    <div class="timeline-item filter-gs">
+      <div class="timeline-badge badge-gs">GS2</div>
+      <div class="timeline-content">
+        <h4>Détection des circulations <span class="date">30/09 → 04/10/2024</span></h4>
+        <p>Signalisation, circuits de voie, principes de détection.</p>
       </div>
     </div>
 
-    <!-- Janvier M4 -->
-    <div class="month-column">
-      <h3>Janv. 2025</h3>
-
-      <div class="event event-formation">
-        <strong>GS5 – Compléments techniques</strong>
-        Janvier
-        <span class="event-note">Approfondissement sur un domaine clé de l’unité</span>
-      </div>
-
-      <div class="event event-stage">
-        <strong>Stage ES – Rapport</strong>
-        Fin janvier
-        <span class="event-note">Production du 1er rapport d’observation / analyse</span>
+    <div class="timeline-item filter-bilan">
+      <div class="timeline-badge badge-bilan">Bilan</div>
+      <div class="timeline-content">
+        <h4>Point d’intégration J+15 <span class="date">Semaine du 07/10</span></h4>
+        <p>Retour sur l’accueil, vie d’équipe, premières difficultés.</p>
       </div>
     </div>
 
-    <!-- Mars M6 -->
-    <div class="month-column">
-      <h3>Mars 2025</h3>
-
-      <div class="event event-entretien">
-        <strong>Bilan 6 mois</strong>
-        Mi-mars
-        <span class="event-note">Validation de blocs de compétences intermédiaires</span>
-      </div>
-
-      <div class="event event-formation">
-        <strong>GS6 – Approfondissement essais spécifiques</strong>
-        Mars
-        <span class="event-note">Modules ciblés sur le périmètre de Tristan</span>
+    <div class="timeline-item filter-stage">
+      <div class="timeline-badge badge-stage">Stage</div>
+      <div class="timeline-content">
+        <h4>Stage terrain UP Essais <span class="date">2e quinzaine</span></h4>
+        <p>Observation d’essais en situation réelle.</p>
       </div>
     </div>
 
-    <!-- Juin M9 -->
-    <div class="month-column">
-      <h3>Juin 2025</h3>
+    <div class="timeline-month">Novembre 2024</div>
 
-      <div class="event event-entretien">
-        <strong>Bilan 9 mois</strong>
-        Début juin
-        <span class="event-note">Préparation à une 1re autonomie encadrée</span>
-      </div>
-
-      <div class="event event-stage">
-        <strong>Stage de consolidation</strong>
-        2e quinzaine
-        <span class="event-note">Essais en autonomie encadrée, retour d’expérience</span>
+    <div class="timeline-item filter-gs">
+      <div class="timeline-badge badge-gs">GS3</div>
+      <div class="timeline-content">
+        <h4>Enclenchements / logiques <span class="date">1re quinzaine</span></h4>
+        <p>Principes d’enclenchement, sécurité des itinéraires.</p>
       </div>
     </div>
 
-    <!-- Septembre M12 -->
-    <div class="month-column">
-      <h3>Sept. 2025</h3>
-
-      <div class="event event-entretien">
-        <strong>Bilan 12 mois</strong>
-        Début septembre
-        <span class="event-note">Validation du parcours et positionnement en équipe</span>
+    <div class="timeline-item filter-stage">
+      <div class="timeline-badge badge-stage">Stage</div>
+      <div class="timeline-content">
+        <h4>Stage EIC <span class="date">2e quinzaine</span></h4>
+        <p>Organisation circulation, relations Essais / Exploitation.</p>
       </div>
+    </div>
 
-      <div class="event event-formation">
-        <strong>GS9 / Module final</strong>
-        Dates selon plan
-        <span class="event-note">Bouclage des compétences et retours sur pratique</span>
+    <div class="timeline-month">Décembre 2024</div>
+
+    <div class="timeline-item filter-bilan">
+      <div class="timeline-badge badge-bilan">3M</div>
+      <div class="timeline-content">
+        <h4>Bilan 3 mois <span class="date">Semaine du 09/12</span></h4>
+        <p>Retour sur comportement, sécurité, prérequis techniques.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item filter-gs">
+      <div class="timeline-badge badge-gs">GS4</div>
+      <div class="timeline-content">
+        <h4>Installations de sécurité <span class="date">Décembre</span></h4>
+        <p>Approfondissement installations de sécurité.</p>
       </div>
     </div>
 
