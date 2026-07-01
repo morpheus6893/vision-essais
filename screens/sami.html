@@ -1,0 +1,64 @@
+<section class="screen-sami">
+  
+  <h2>Suivi des Évaluations SAMI</h2>
+  <p class="text-muted">Injectez les grilles d'évaluation PDF pour analyser automatiquement la progression de l'apprenant.</p>
+
+  <div class="card upload-section">
+    <h3>Importer une nouvelle évaluation</h3>
+    <div id="drop-zone" class="drop-zone">
+      <img src="img/icon-pdf.png" alt="PDF Icon" class="upload-icon" style="width: 48px; opacity: 0.6; margin-bottom: 10px;">
+      <p>Glissez-déposez le fichier PDF SAMI ici ou <label for="file-sami" class="file-label">parcourez vos fichiers</label></p>
+      <input type="file" id="file-sami" accept="application/pdf" style="display: none;">
+    </div>
+    <div id="upload-status" class="upload-status"></div>
+  </div>
+
+  <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+    
+    <div class="card stat-card">
+      <h4>Formations Évaluées</h4>
+      <div class="stat-number" id="stat-total-formations" style="font-size: 2.5rem; font-weight: bold; color: #0056b3;">0</div>
+      <p class="small text-muted">Grilles SAMI traitées</p>
+    </div>
+
+    <div class="card stat-card">
+      <h4>Profil Global (Objectifs)</h4>
+      <ul style="list-style: none; padding: 0; margin: 10px 0 0 0;">
+        <li><strong style="color: green;">S (Satisfaisant) :</strong> <span id="count-s">0</span></li>
+        <li><strong style="color: #29b6f6;">A (Acceptable) :</strong> <span id="count-a">0</span></li>
+        <li><strong style="color: #orange;">M (Moyen) :</strong> <span id="count-m">0</span></li>
+        <li><strong style="color: red;">I (Insuffisant) :</strong> <span id="count-i">0</span></li>
+      </ul>
+    </div>
+
+    <div class="card stat-card">
+      <h4>Attestations Délivrées</h4>
+      <div class="stat-number" id="stat-attestations" style="font-size: 2.5rem; font-weight: bold; color: #28a745;">0%</div>
+      <p class="small text-muted">De taux d'obtention globale</p>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-top: 20px;">
+    <h3>Historique des modules analysés</h3>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px;">
+        <thead>
+          <tr style="border-bottom: 2px solid #ddd; background-color: #f8f9fa;">
+            <th style="padding: 12px;">Code & Intitulé</th>
+            <th style="padding: 12px;">Période</th>
+            <th style="padding: 12px;">Formateur</th>
+            <th style="padding: 12px; text-align: center;">Résultat Global</th>
+            <th style="padding: 12px; text-align: center;">Fichier</th>
+          </tr>
+        </thead>
+        <tbody id="table-sami-body">
+          <tr>
+            <td colspan="5" style="padding: 20px; text-align: center; color: #999;">Aucune évaluation chargée pour le moment.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
