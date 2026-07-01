@@ -7,32 +7,36 @@ body {
   color: #333;
 }
 
-/* === NAVIGATION === */
-nav {
+/* === NAVIGATION (Optimisée avec tes classes) === */
+.main-nav {
   background-color: #003b72;
   padding: 10px 20px;
   position: sticky;
   top: 0;
   z-index: 100;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
-nav button {
+.main-nav button {
   background: none;
   border: none;
   color: white;
   padding: 8px 12px;
-  margin-right: 5px;
   cursor: pointer;
   border-radius: 4px;
   font-size: 0.9rem;
+  transition: background-color 0.2s ease;
 }
 
-nav button:hover {
+.main-nav button:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-nav button.active {
+.main-nav button.active {
   background-color: #005fa3;
+  font-weight: bold;
 }
 
 /* === LAYOUT === */
@@ -42,16 +46,10 @@ nav button.active {
   padding: 20px;
 }
 
-.screen {
-  display: none;
-  background: white;
+#screen-container {
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.screen.active {
-  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .screen-accueil {
@@ -59,6 +57,8 @@ nav button.active {
   background-color: #f8f9fa;
   color: #222;
   position: relative;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* === CARTES === */
@@ -73,6 +73,7 @@ nav button.active {
 
 .card h3 {
   color: #003366;
+  margin-top: 0;
   margin-bottom: 0.5rem;
 }
 
@@ -125,6 +126,10 @@ nav button.active {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.profile ul li {
+  margin-bottom: 5px;
 }
 
 /* === GRILLES === */
@@ -218,6 +223,7 @@ nav button.active {
   margin-bottom: 1rem;
   border-radius: 4px;
   border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 .error {
@@ -273,7 +279,7 @@ nav button.active {
   font-size: 1.2rem;
   color: #002244;
   margin: 30px 0 15px -42px;
-  background: #f4f7f6; /* À adapter selon ton fond */
+  background: #f4f7f6;
   padding: 5px 10px;
   display: inline-block;
   border-radius: 4px;
@@ -343,4 +349,25 @@ nav button.active {
   margin: 0;
   color: #555;
   font-size: 0.95rem;
+}
+
+/* === RESPONSIVE DESIGN (Nouveau) === */
+@media (max-width: 768px) {
+  .agent-tuteur-grid,
+  .grid-2,
+  .form-grid {
+    grid-template-columns: 1fr; /* Bascule sur une seule colonne sur mobile */
+  }
+  
+  .logo-vision {
+    position: static;
+    display: block;
+    margin: 10px auto;
+  }
+  
+  .timeline-content h4 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
 }
