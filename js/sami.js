@@ -2,7 +2,7 @@
 // MODULE SAMI – ANALYSE ET PARSING DE GRILLES PDF D'ÉVALUATION
 // =======================================================================
 
-import { db } from "./firebase-config.js";
+import { db } from "./app.js";
 import { collection, doc, getDoc, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 // URL du Worker requis par la bibliothèque PDF.js de Mozilla
