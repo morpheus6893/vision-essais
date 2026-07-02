@@ -58,7 +58,15 @@ function runScreenScript(name) {
       break;
 
     case "admin":
-      if (typeof initAdmin === "function") initAdmin();
+      console.log("Écran Admin injecté -> Chargement du script d'administration");
+      // CORRECTION : Importation dynamique du module admin.js autonome
+      import("./admin.js")
+        .then(module => {
+          if (typeof module.initAdmin === "function") {
+            module.initAdmin();
+          }
+        })
+        .catch(err => console.error("Erreur lors de l'initialisation du module ADMIN :", err));
       break;
 
     case "login":
