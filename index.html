@@ -9,22 +9,18 @@
 
   <link rel="stylesheet" href="css/style.css?v=2">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css?v=2">
-
-  <!-- PDF.js -->
   <script src="libs/pdfjs/pdf.js"></script>
   <script>
+    // Récupération sécurisée de l'instance globale du build PDF.js
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = "libs/pdfjs/pdf.worker.js";
   </script>
 
-  <!-- Scripts en modules -->
   <script type="module" src="js/app.js"></script>
-</head>
+ </head>
 
 <body>
 
-  <!-- HEADER -->
   <header class="app-header">
     <h1>Vision Essais – Livret digitalisé</h1>
 
@@ -39,10 +35,8 @@
     </nav>
   </header>
 
-  <!-- CONTENU DYNAMIQUE -->
   <main id="screen-container">
-    <!-- Les écrans seront chargés ici -->
-  </main>
+    </main>
 
 </body>
 </html>
