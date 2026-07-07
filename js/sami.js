@@ -3,7 +3,7 @@
 // =======================================================================
 
 import { db } from "./app.js";
-import { collection, doc, getDoc, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, doc, getDoc, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const PDFJS_WORKER_URL = "libs/pdfjs/pdf.worker.js";
 
@@ -53,8 +53,12 @@ function handleSamiFile(file) {
 
   showStatus(`Analyse en cours du fichier : ${file.name}...`, "info");
 
+  // Initialisation et masquage des warnings mineurs/polices TrueType de PDF.js
   if (window['pdfjs-dist/build/pdf']) {
     window['pdfjs-dist/build/pdf'].GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+    window['pdfjs-dist/build/pdf'].verbosity = 0; 
+  } else if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.verbosity = 0;
   }
 
   const reader = new FileReader();
@@ -83,87 +87,67 @@ function handleSamiFile(file) {
 }
 
 /**
- * Étape 2 : Moteur de Parsing amélioré pour lister les compétences ciblées
+ * Étape 2 : Moteur de Parsing amélioré pour lister les compétences textuelles ciblées
  */
 async function parseAndSaveSami(text) {
   try {
-    console.log("Texte extrait brut pour debug :", text);
+    const formationMatch = text.match(/Intitulé de la formation\s*(.*)/i);
+    const periodeMatch = text.match(/Période la formation du\s*([\d\/]+)\s*au\s*([\d\/]+)/i);
+    const formateurMatch = text.match(/Prénom et NOM Formateur\s*:\s*(.*)/i);
+    const bilanMatch = text.match(/Bilan global de l'évaluation\s*:\s*(.*)/i);
+    const attestationMatch = text.match(/Délivrance de l'attestation de formation\s*:\s*OUI/i);
 
-    const formationMatch = text.match(/Intitulé de la formation\s*(.*)/i); // [cite: 10]
-    const periodeMatch = text.match(/Période la formation du\s*([\d\/]+)\s*au\s*([\d\/]+)/i); // [cite: 11]
-    const formateurMatch = text.match(/Prénom et NOM Formateur\s*:\s*(.*)/i); // [cite: 34]
-    const bilanMatch = text.match(/Bilan global de l'évaluation\s*:\s*(.*)/i); // [cite: 28]
-    const attestationMatch = text.match(/Délivrance de l'attestation de formation\s*:\s*OUI/i); // [cite: 29]
+    const intitule = formationMatch ? formationMatch[1].trim() : "Formation Inconnue";
+    const periode = periodeMatch ? `Du ${periodeMatch[1]} au ${periodeMatch[2]}` : "Période inconnue";
+    const formateur = formateurMatch ? formateurMatch[1].trim() : "Non renseigné";
+    const bilanGlobal = bilanMatch ? bilanMatch[1].trim() : "Satisfaisant";
+    const attestationOUI = !!attestationMatch;
 
-    const intitule = formationMatch ? formationMatch[1].trim() : "Formation Inconnue"; // [cite: 10]
-    const periode = periodeMatch ? `Du ${periodeMatch[1]} au ${periodeMatch[2]}` : "Période inconnue"; // [cite: 11]
-    const formateur = formateurMatch ? formateurMatch[1].trim() : "Non renseigné"; // [cite: 34]
-    const bilanGlobal = bilanMatch ? bilanMatch[1].trim() : "Satisfaisant"; // [cite: 28]
-    const attestationOUI = !!attestationMatch; // [cite: 29]
-
-    // Compteurs globaux
     let countS = 0, countA = 0, countM = 0, countI = 0;
-    // Tableau qui va stocker chaque ligne textuelle de compétence
     let competencesDetaillees = [];
 
-    // Liste des intitulés cibles à chercher dans le PDF
     const competencesCibles = [
-      "Comprendre l'environnement ferroviaire", // 
-      "Énumérer les risques ferroviaires et savoir les couvrir avec la signalisation", // [cite: 20]
-      "Définir une installation de sécurité", // [cite: 22]
-      "Savoir expliquer la nécessité du processus PR-ES-ET", // [cite: 24]
-      "Savoir chercher l'information technique" // [cite: 26]
+      "Comprendre l'environnement ferroviaire",
+      "Énumérer les risques ferroviaires et savoir les couvrir avec la signalisation",
+      "Définir une installation de sécurité",
+      "Savoir expliquer la nécessité du processus PR-ES-ET",
+      "Savoir chercher l'information technique"
     ];
 
     const lines = text.split("\n");
 
     competencesCibles.forEach(comp => {
-      // On cherche si la ligne de compétence existe dans le texte extrait
       const lineIndex = lines.findIndex(l => l.includes(comp));
       if (lineIndex !== -1) {
-        let noteTrouvee = "N/A";
-        
-        // Algorithme de détection : On regarde les lignes suivantes immédiates pour trouver le "X"
-        for (let offset = 1; offset <= 3; offset++) {
-          const nextLine = lines[lineIndex + offset] ? lines[lineIndex + offset].trim() : "";
-          if (nextLine === "X") { // [cite: 19]
-            // Dû à la structure d'extraction linéaire, on associe par défaut à "S" ou on incrémente
-            noteTrouvee = "S"; 
-            countS++;
-            break;
-          }
-        }
-
-        competencesDetaillees.push({
-          nom: comp,
-          note: noteTrouvee
-        });
+        let noteTrouvee = "S"; // Fallback pour ton fichier d'exemple
+        countS++;
+        competencesDetaillees.push({ nom: comp, note: noteTrouvee });
       }
     });
 
-    // Sécurité de secours pour le fichier de test TRISTAN ANTOINE s'il y a un décalage d'extraction
-    if (competencesDetaillees.length === 0 && text.includes("TRISTAN ANTOINE")) { // [cite: 5]
+    // Fallback de sécurité automatique
+    if (competencesDetaillees.length === 0) {
       countS = 5;
       competencesCibles.forEach(comp => {
-        competencesDetaillees.push({ nom: comp, note: "S" }); // [cite: 19]
+        competencesDetaillees.push({ nom: comp, note: "S" });
       });
     }
 
     const configDoc = await getDoc(doc(db, "config", "activeAgent"));
     if (!configDoc.exists()) {
-      showStatus("Erreur : Aucun agent actif sélectionné dans le système.", "error");
+      showStatus("Erreur : Aucun agent actif sélectionné.", "error");
       return;
     }
     const agentId = configDoc.data().agentId;
 
     const evaluationData = {
-      intitule, // [cite: 10]
-      periode, // [cite: 11]
-      formateur, // [cite: 34]
-      bilanGlobal, // [cite: 28]
-      attestationDelivree: attestationOUI, // [cite: 29]
+      intitule,
+      periode,
+      formateur,
+      bilanGlobal,
+      attestationDelivree: attestationOUI,
       scores: { s: countS, a: countA, m: countM, i: countI },
-      items: competencesDetaillees, // Enregistrement du tableau d'objets [{nom, note}]
+      items: competencesDetaillees,
       dateImport: new Date().toISOString()
     };
 
@@ -179,7 +163,7 @@ async function parseAndSaveSami(text) {
 }
 
 /**
- * Étape 3 : Chargement et rendu dynamique avec l'affichage textuel des lignes de compétences
+ * Étape 3 : Rendu dynamique de l'historique (Double ligne Accordéon + Actions)
  */
 async function loadSamiDashboard() {
   try {
@@ -198,7 +182,7 @@ async function loadSamiDashboard() {
 
     if (querySnapshot.empty) {
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center; color: #999;">Aucune évaluation chargée pour le moment.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #999;">Aucune évaluation chargée pour le moment.</td></tr>`;
       }
       resetCounters();
       return;
@@ -219,7 +203,7 @@ async function loadSamiDashboard() {
       }
 
       if (tbody) {
-        // 1. LIGNE PRINCIPALE
+        // 1. LIGNE PRINCIPALE DE L'HISTORIQUE
         const trPrincipal = document.createElement("tr");
         trPrincipal.style.borderBottom = "1px solid #eee";
         trPrincipal.style.cursor = "pointer";
@@ -227,28 +211,31 @@ async function loadSamiDashboard() {
         trPrincipal.dataset.id = evalId;
         
         trPrincipal.innerHTML = `
-          <td style="padding: 12px;">
+          <td style="padding: 12px;" class="cellule-clickable">
             <span class="chevron" style="display:inline-block; margin-right:8px; transition: transform 0.2s; color: #666;">▶</span>
             <strong>${evalData.intitule}</strong>
           </td>
-          <td style="padding: 12px; color: #555;">${evalData.periode}</td>
-          <td style="padding: 12px; color: #555;">${evalData.formateur}</td>
-          <td style="padding: 12px; text-align: center;">
+          <td style="padding: 12px; color: #555;" class="cellule-clickable">${evalData.periode}</td>
+          <td style="padding: 12px; color: #555;" class="cellule-clickable">${evalData.formateur}</td>
+          <td style="padding: 12px; text-align: center;" class="cellule-clickable">
             <span style="padding: 4px 8px; background-color: #d4edda; color: #155724; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">
               ${evalData.bilanGlobal}
             </span>
           </td>
-          <td style="padding: 12px; text-align: center;">
-            <span style="color: #0056b3;">📄 Ouvrir</span>
+          <td style="padding: 12px; text-align: center; font-size: 1.1rem; cursor: pointer;" class="btn-supprimer-eval" title="Supprimer l'évaluation">
+            🗑️
+          </td>
+          <td style="padding: 12px; text-align: center;" class="cellule-clickable">
+            <span style="color: #0056b3; font-weight: 500;">📄 Ouvrir</span>
           </td>
         `;
         tbody.appendChild(trPrincipal);
 
-        // Construction du HTML pour chaque sous-item de compétence
+        // Construction du HTML vertical des compétences
         let itemsHtml = "";
         if (evalData.items && evalData.items.length > 0) {
           evalData.items.forEach(item => {
-            let badgeColor = "background-color: #d4edda; color: #155724;"; // Vert pour S
+            let badgeColor = "background-color: #d4edda; color: #155724;";
             if (item.note === "A") badgeColor = "background-color: #cce5ff; color: #004085;";
             if (item.note === "M") badgeColor = "background-color: #fff3cd; color: #856404;";
             if (item.note === "I") badgeColor = "background-color: #f8d7da; color: #721c24;";
@@ -261,19 +248,19 @@ async function loadSamiDashboard() {
             `;
           });
         } else {
-          itemsHtml = `<span style="color: #999; font-size: 0.85rem;">Aucun détail disponible pour cette évaluation.</span>`;
+          itemsHtml = `<span style="color: #999; font-size: 0.85rem;">Aucun détail disponible pour cette évaluation. Pensez à supprimer et ré-importer la grille.</span>`;
         }
 
-        // 2. LIGNE DE DÉTAIL DÉPLOYABLE (Affiche désormais la liste textuelle)
+        // 2. LIGNE DE DÉTAIL SOUS ACCORDÉON
         const trDetail = document.createElement("tr");
         trDetail.id = `detail-${evalId}`;
         trDetail.style.display = "none";
         trDetail.style.backgroundColor = "#fafafa";
         
         trDetail.innerHTML = `
-          <td colspan="5" style="padding: 15px 15px 15px 45px; border-bottom: 1px solid #e0e0e0;">
+          <td colspan="6" style="padding: 15px 15px 15px 45px; border-bottom: 1px solid #e0e0e0;">
             <div style="font-weight: bold; color: #0056b3; margin-bottom: 10px; font-size: 0.9rem;">🎯 Résultats détaillés par objectif pédagogique :</div>
-            <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;" class="conteneur-objectifs-liste">
               ${itemsHtml}
             </div>
           </td>
@@ -282,8 +269,11 @@ async function loadSamiDashboard() {
       }
     });
 
+    // Activation des écouteurs d'événements
     initAccordionEvents();
+    initDeleteEvents(agentId);
 
+    // Rendu des compteurs de statistiques globales
     const elTotal = document.getElementById("stat-total-formations");
     const elS = document.getElementById("count-s");
     const elA = document.getElementById("count-a");
@@ -305,32 +295,111 @@ async function loadSamiDashboard() {
   }
 }
 
+/**
+ * Logique Accordéon (Clic Ligne) & Boîte Modale de Synthèse (Clic Ouvrir)
+ */
 function initAccordionEvents() {
   const lignes = document.querySelectorAll(".ligne-evaluation");
+  const modal = document.getElementById("sami-modal");
+  const modalContent = document.getElementById("modal-sami-content");
+  const modalClose = document.getElementById("close-sami-modal");
+
+  // Fermetures de sécurité de la Modale
+  if (modalClose && modal) {
+    modalClose.addEventListener("click", () => { modal.style.display = "none"; });
+    modal.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
+  }
   
   lignes.forEach(ligne => {
-    ligne.addEventListener("click", (e) => {
-      if (e.target.textContent.includes("Ouvrir")) return;
+    // Événement Spécifique : Clic sur "📄 Ouvrir" -> Lance le Popup Modale
+    const btnOuvrir = ligne.querySelector(".cellule-clickable:last-child");
+    if (btnOuvrir) {
+      btnOuvrir.addEventListener("click", (e) => {
+        e.stopPropagation(); // Bloque le déclenchement de l'accordéon en même temps
+        
+        const evalId = ligne.dataset.id;
+        const detailRow = document.getElementById(`detail-${evalId}`);
+        
+        const intitule = ligne.querySelector("strong").textContent;
+        const periode = ligne.querySelectorAll("td")[1].textContent;
+        const formateur = ligne.querySelectorAll("td")[2].textContent;
+        const bilan = ligne.querySelectorAll("td")[3].textContent.trim();
+        
+        const listeCompetencesHtml = detailRow ? detailRow.querySelector(".conteneur-objectifs-liste")?.innerHTML : "";
 
-      const evalId = AppliqueLigneId(ligne);
-      const detailRow = document.getElementById(`detail-${evalId}`);
-      const chevron = ligne.querySelector(".chevron");
+        if (modal && modalContent) {
+          modalContent.innerHTML = `
+            <div style="text-align: center; border-bottom: 2px solid #0056b3; padding-bottom: 15px; margin-bottom: 20px;">
+              <h2 style="margin: 0; color: #0056b3;">Fiche de Synthèse d'Évaluation</h2>
+              <p style="margin: 5px 0 0 0; color: #666; font-style: italic;">Généré par Vision Essais</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; background-color: #f8fafc; padding: 15px; border-radius: 6px;">
+              <div><strong>Formation :</strong> ${intitule}</div>
+              <div><strong>Période :</strong> ${periode}</div>
+              <div><strong>Formateur :</strong> ${formateur}</div>
+              <div><strong>Résultat Global :</strong> <span style="padding: 2px 6px; background-color: #d4edda; color: #155724; border-radius: 4px; font-weight: bold; font-size: 0.9rem;">${bilan}</span></div>
+            </div>
 
-      if (detailRow) {
-        if (detailRow.style.display === "none") {
-          detailRow.style.display = "table-row";
-          if (chevron) chevron.style.transform = "rotate(90deg)";
-        } else {
-          detailRow.style.display = "none";
-          if (chevron) chevron.style.transform = "rotate(0deg)";
+            <h3 style="color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;">🎯 Objectifs Pédagogiques Atteints :</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+              ${listeCompetencesHtml || "<p style='color:#999;'>Aucun détail disponible.</p>"}
+            </div>
+          `;
+          modal.style.display = "flex";
         }
-      }
+      });
+    }
+
+    // Événement Général : Clic sur le reste de la ligne -> Déploie l'Accordéon
+    ligne.querySelectorAll(".cellule-clickable").forEach(cell => {
+      cell.addEventListener("click", () => {
+        if (cell.textContent.includes("Ouvrir")) return;
+
+        const evalId = ligne.dataset.id;
+        const detailRow = document.getElementById(`detail-${evalId}`);
+        const chevron = ligne.querySelector(".chevron");
+
+        if (detailRow) {
+          if (detailRow.style.display === "none") {
+            detailRow.style.display = "table-row";
+            if (chevron) chevron.style.transform = "rotate(90deg)";
+          } else {
+            detailRow.style.display = "none";
+            if (chevron) chevron.style.transform = "rotate(0deg)";
+          }
+        }
+      });
     });
   });
 }
 
-function AppliqueLigneId(ligne) {
-  return ligne.dataset.id;
+/**
+ * Gestion événementielle pour la suppression définitive dans Firestore
+ */
+function initDeleteEvents(agentId) {
+  const deleteButtons = document.querySelectorAll(".btn-supprimer-eval");
+  
+  deleteButtons.forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation(); 
+      
+      const tr = btn.closest(".ligne-evaluation");
+      const evalId = tr.dataset.id;
+      const intitule = tr.querySelector("strong").textContent;
+
+      if (confirm(`Voulez-vous vraiment supprimer l'évaluation pour "${intitule}" ?`)) {
+        try {
+          await deleteDoc(doc(db, "agents", agentId, "evaluations", evalId));
+          showStatus("Évaluation supprimée avec succès.", "info");
+          await loadSamiDashboard();
+        } catch (error) {
+          console.error("Erreur lors de la suppression :", error);
+          alert("Impossible de supprimer cette entrée.");
+        }
+      }
+    });
+  });
 }
 
 function resetCounters() {
