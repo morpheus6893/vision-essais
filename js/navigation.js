@@ -42,8 +42,20 @@ function runScreenScript(name) {
       break;
 
     case "parcours":
-      console.log("Écran Parcours injecté -> Activation des filtres");
+      console.log("Écran Parcours injecté -> Activation des filtres & du suivi de livret");
+      
       initParcoursFilters();
+
+      // 🎯 IMPORTATION ET PASSAGE DU RÔLE EFFECTIF
+      import(`./parcours.js?t=${Date.now()}`)
+        .then(async (module) => {
+          if (typeof module.initParcours === "function") {
+            // On récupère dynamiquement le rôle détecté dans app.js
+            const { roleUtilisateurConnecte } = await import("./app.js?v=2");
+            module.initParcours(roleUtilisateurConnecte);
+          }
+        })
+        .catch(err => console.error("Erreur lors de l'initialisation du module PARCOURS :", err));
       break;
 
     case "sami":
