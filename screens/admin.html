@@ -1,62 +1,109 @@
-<section id="admin" class="screen">
-
-  <h2>Administration – Gestion des agents</h2>
-
-  <!-- Bouton déconnexion -->
-  <button class="btn-secondary" onclick="logoutAdmin()">Déconnexion</button>
-
-  <hr>
-
-  <!-- Formulaire d'ajout d'un agent -->
-  <div class="card">
-    <h3>Ajouter un agent</h3>
-
-    <div class="form-grid">
+<div style="max-width: 900px; margin: 30px auto; padding: 20px; font-family: sans-serif;">
+  <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">🛡️ Espace Administration – Droits & Liaisons</h2>
+  
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px;">
+    <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; margin-bottom: 15px;">➕ Déclarer un accès utilisateur</h3>
+    
+    <form id="form-creation-user" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
       <div>
-        <label>Nom</label>
-        <input id="agent-nom" type="text" placeholder="Nom complet">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">Nom de famille</label>
+        <input type="text" id="admin-user-nom" required placeholder="ex: ANTOINE" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
       </div>
 
       <div>
-        <label>Unité</label>
-        <input id="agent-unite" type="text" placeholder="Ex : Essais Dijon">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">Prénom</label>
+        <input type="text" id="admin-user-prenom" required placeholder="ex: Tristan" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+      </div>
+      
+      <div>
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">Adresse Email SNCF</label>
+        <input type="email" id="admin-user-email" required placeholder="exemple@reseau.sncf.fr" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
       </div>
 
       <div>
-        <label>Poste</label>
-        <input id="agent-poste" type="text" placeholder="Ex : Agent d’essais">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">Rôle applicatif</label>
+        <select id="admin-user-role" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; box-sizing: border-box;">
+          <option value="apprenant">Apprenant (Lecture seule, livret bloqué)</option>
+          <option value="tuteur">Tuteur (Visa des volets A et C de ses apprenants)</option>
+          <option value="manager">Manager / DPX (Suivi complet du groupe/unité)</option>
+          <option value="admin">Administrateur (Accès total)</option>
+        </select>
       </div>
 
       <div>
-        <label>Session</label>
-        <input id="agent-session" type="text" placeholder="Ex : 14 Bis">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">Affectation / Unité (Ex: PEI Dijon)</label>
+        <input type="text" id="admin-user-unite" placeholder="ex: PEI Dijon" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
       </div>
-    </div>
 
-    <button class="btn-primary" onclick="addAgent()">Ajouter l’agent</button>
+      <div>
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 5px;">UID Firebase (Optionnel)</label>
+        <input type="text" id="admin-user-uid" placeholder="UID si déjà inscrit" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+      </div>
+
+      <div style="grid-column: span 2; text-align: right; margin-top: 10px;">
+        <button type="submit" style="background: #0056b3; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">💾 Enregistrer l'utilisateur</button>
+      </div>
+    </form>
   </div>
 
-  <hr>
-
-  <!-- Liste des agents -->
-  <div class="card">
-    <h3>Liste des agents enregistrés</h3>
-
-    <table id="admin-list" class="admin-table">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px;">
+    <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; margin-bottom: 15px;">📋 Comptes, Rôles & Unités</h3>
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
       <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Unité</th>
-          <th>Poste</th>
-          <th>Session</th>
-          <th>Actions</th>
+        <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+          <th style="padding: 12px; color: #475569;">Nom Complet</th>
+          <th style="padding: 12px; color: #475569;">Email / Unité</th>
+          <th style="padding: 12px; color: #475569;">Rôle</th>
+          <th style="padding: 12px; color: #475569; text-align: center;">Actions</th>
         </tr>
       </thead>
-
-      <tbody>
-        <!-- Rempli dynamiquement par app.js -->
-      </tbody>
+      <tbody id="table-users-body"></tbody>
     </table>
   </div>
 
-</section>
+  <hr style="margin: 40px 0; border: 0; border-top: 1px dashed #cbd5e1;">
+
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; margin-bottom: 15px;">👥 Attribution et Gestion des Agents</h3>
+    
+    <div id="form-agent-container" style="background: #f8fafc; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+      <h4 style="margin: 0 0 12px 0; color: #334155;" id="agent-form-title">Créer ou Modifier une fiche Agent</h4>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+        <input type="hidden" id="agent-form-id">
+        <input type="text" id="agent-form-nom" placeholder="Nom complet (ex: Tristan ANTOINE)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; width: 100%;">
+        <input type="text" id="agent-form-unite" placeholder="Unité (ex: ET Dijon)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; width: 100%;">
+        <input type="text" id="agent-form-session" placeholder="Session (ex: 14 Bis)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; width: 100%;">
+        
+        <select id="agent-form-tuteur" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; box-sizing: border-box; width: 100%;">
+          <option value="">-- Choisir un Tuteur Référent --</option>
+        </select>
+        <input type="text" id="agent-form-poste" placeholder="Poste (ex: Assistant Essais)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; width: 100%;">
+        
+        <div style="grid-column: span 3; display: flex; align-items: center; gap: 15px; background: #ffffff; padding: 10px; border-radius: 4px; border: 1px solid #cbd5e1; box-sizing: border-box;">
+          <div style="width: 55px; height: 55px; border-radius: 50%; overflow: hidden; background: #e2e8f0; border: 2px solid #cbd5e1; flex-shrink: 0;">
+            <img id="agent-form-preview" src="img/default.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="flex-grow: 1;">
+            <label for="agent-form-file" style="display: block; font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 4px; cursor: pointer;">Insérer la photo d'identité</label>
+            <input type="file" id="agent-form-file" accept="image/*" style="font-size: 0.8rem; display: block; width: 100%;">
+          </div>
+        </div>
+        
+        <button id="btn-save-agent" style="grid-column: span 3; background: #10b981; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 4px; font-size: 0.95rem;">💾 Sauvegarder la fiche Agent</button>
+      </div>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+      <thead>
+        <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+          <th style="padding: 12px; color: #475569;">Agent</th>
+          <th style="padding: 12px; color: #475569;">Unité / Session</th>
+          <th style="padding: 12px; color: #475569;">Tuteur Référent</th>
+          <th style="padding: 12px; color: #475569; text-align: center;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="table-agents-body"></tbody>
+    </table>
+  </div>
+</div>
