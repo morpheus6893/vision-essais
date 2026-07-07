@@ -17,7 +17,8 @@ import {
   addDoc, 
   deleteDoc, 
   doc,
-  getDoc
+  getDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // =============================================================
@@ -41,10 +42,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 export const db = getFirestore(app);
 
+// 🔐 Stockage global des informations utilisateur (sécurité et périmètre)
+let roleUtilisateurActuel = "apprenant";
+let uniteUtilisateurActuel = "";
+
 // =============================================================
-// Navigation
+// Navigation & Modules Métiers
 // =============================================================
 import { initNavigation, loadScreen } from "./navigation.js?v=2";
+import { initParcours } from "./parcours.js"; // 📘 Suivi de parcours
 
 // =============================================================
 // Initialisation globale & Sécurisation des routes
@@ -52,9 +58,27 @@ import { initNavigation, loadScreen } from "./navigation.js?v=2";
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Vision Essais – Application initialisée");
 
-  // Initialise les écouteurs de clics sur le menu de base
+  // Initialise les écouteurs de clics sur la barre de navigation globale
   initNavigation();
   initPdfImport();
+
+  // Écouteur global sur la barre de navigation pour capter quand on clique sur "Parcours"
+  const mainNav = document.querySelector(".main-nav");
+  if (mainNav) {
+    mainNav.addEventListener("click", (e) => {
+      // Si on clique sur le bouton parcours
+      if (e.target.closest('[data-screen="parcours"]') || e.target.textContent.includes("Parcours")) {
+        // Laisse une infime fraction de seconde à loadScreen pour injecter le HTML, puis initialise avec le rôle
+        setTimeout(() => {
+          initParcours(roleUtilisateurActuel);
+        }, 150);
+      }
+      // Si on retourne sur l'accueil, on recharge les datas de l'agent
+      if (e.target.closest('[data-screen="accueil"]') || e.target.textContent.includes("Accueil")) {
+        setTimeout(() => tryLoadAccueil(), 150);
+      }
+    });
+  }
 
   // 🔒 LE GARDIEN : Surveillance en temps réel de l'état de connexion
   onAuthStateChanged(auth, async (user) => {
@@ -62,22 +86,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (user) {
       console.log("Utilisateur connecté :", user.email);
-      
-      // 1. Affiche la barre de navigation complète
       if (navBar) navBar.classList.remove("hidden");
 
-      // 2. Charge l'écran d'accueil par défaut
-      await loadScreen("accueil");
+      try {
+        // 🕵️‍♂️ Récupération du rôle et de l'unité dans Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (userDocSnap.exists()) {
+          const data = userDocSnap.data();
+          roleUtilisateurActuel = data.role || "apprenant";
+          uniteUtilisateurActuel = data.unite || "";
+          console.log(`[Auth] Profil chargé. Rôle : ${roleUtilisateurActuel} | Unité : ${uniteUtilisateurActuel}`);
+        } else {
+          console.warn("[Auth] Aucun profil trouvé dans la collection 'users'. Rôle restreint à 'apprenant'.");
+          roleUtilisateurActuel = "apprenant";
+          uniteUtilisateurActuel = "";
+        }
+      } catch (err) {
+        console.error("[Auth] Erreur lors du chargement du rôle utilisateur :", err);
+        roleUtilisateurActuel = "apprenant";
+        uniteUtilisateurActuel = "";
+      }
 
-      // 3. Récupère les données de l'agent actif sur Firestore
+      // 🎯 CONFIGURATION DU SÉLECTEUR D'APPRENANT (Filtrage par Rôles et Périmètres)
+      await setupGlobalSelecteur();
+
+      // Charge l'écran d'accueil par défaut
+      await loadScreen("accueil");
       tryLoadAccueil();
     } else {
       console.log("Aucun utilisateur connecté -> Redirection forcée");
-      
-      // 1. Masque la barre de navigation pour empêcher de tricher en cliquant
       if (navBar) navBar.classList.add("hidden");
-
-      // 2. Force l'affichage de l'écran de login
+      
+      const container = document.getElementById("selecteur-apprenant-container");
+      if (container) container.style.display = "none"; 
+      
+      roleUtilisateurActuel = "apprenant"; // Réinitialisation du rôle
+      uniteUtilisateurActuel = "";
       loadScreen("login");
     }
   });
@@ -88,13 +134,122 @@ document.addEventListener("DOMContentLoaded", () => {
     if (nomEl) {
       loadAccueil();
     } else if (retry < 5) {
-      setTimeout(() => tryLoadAccueil(retry + 1), 500);
+      setTimeout(() => tryLoadAccueil(retry + 1), 300);
     }
   }
 });
 
 // =============================================================
-// CONNEXION (Utilisée par l'écran login)
+// LOGIQUE DU SÉLECTEUR D'APPRENANT GLOBAL
+// =============================================================
+async function setupGlobalSelecteur() {
+  const container = document.getElementById("selecteur-apprenant-container");
+  const select = document.getElementById("global-select-apprenant");
+  
+  if (!container || !select) return;
+
+  // Si l'utilisateur est un simple apprenant, on cache complètement le sélecteur
+  if (roleUtilisateurActuel === "apprenant") {
+    container.style.display = "none";
+    return;
+  }
+
+  try {
+    // 1. Récupérer l'agent actuellement sélectionné globalement
+    const configDoc = await getDoc(doc(db, "config", "activeAgent"));
+    const activeAgentId = configDoc.exists() ? configDoc.data().agentId : null;
+
+    // 2. Charger tous les agents de la base
+    const querySnapshot = await getDocs(collection(db, "agents"));
+    select.innerHTML = ""; // Vider le sélecteur
+
+    if (querySnapshot.empty) {
+      select.innerHTML = `<option value="">Aucun agent disponible</option>`;
+      container.style.display = "block";
+      return;
+    }
+
+    let nbAgentsVisibles = 0;
+
+    // 3. Remplir les choix du select selon le niveau d'accès réel
+    querySnapshot.forEach((docSnap) => {
+      const agent = docSnap.data();
+      let aLeDroitDeVoir = false;
+
+      if (roleUtilisateurActuel === "admin") {
+        // L'admin a une vision totale sur l'ensemble du réseau
+        aLeDroitDeVoir = true;
+      } 
+      else if (roleUtilisateurActuel === "manager") {
+        // Le manager ne voit que sa structure / unité (ex: PEI Dijon)
+        if (agent.unite && agent.unite.trim().toLowerCase() === uniteUtilisateurActuel.trim().toLowerCase()) {
+          aLeDroitDeVoir = true;
+        }
+      } 
+      else if (roleUtilisateurActuel === "tuteur") {
+        // Le tuteur ne voit que les agents dont l'identifiant tuteur concorde (UID ou email de liaison)
+        const currentUser = auth.currentUser;
+        if (agent.tuteurId && (agent.tuteurId === currentUser.uid || agent.tuteurId === currentUser.email)) {
+          aLeDroitDeVoir = true;
+        }
+      }
+
+      if (aLeDroitDeVoir) {
+        nbAgentsVisibles++;
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${agent.nom} (${agent.unite || "Sans unité"})`;
+        if (docSnap.id === activeAgentId) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      }
+    });
+
+    // 4. Gestion de l'affichage du conteneur selon le nombre de profils trouvés
+    if (nbAgentsVisibles > 0) {
+      container.style.display = "block";
+    } else {
+      select.innerHTML = `<option value="">Aucun agent lié à votre périmètre</option>`;
+      container.style.display = "block";
+      return;
+    }
+
+    // 5. Écouter les changements de sélection (et purger les écouteurs précédents)
+    select.replaceWith(select.cloneNode(true));
+    const newSelect = document.getElementById("global-select-apprenant");
+
+    newSelect.addEventListener("change", async (e) => {
+      const nouveauAgentId = e.target.value;
+      if (!nouveauAgentId) return;
+
+      console.log(`[Sélecteur] Changement de cible vers l'agent ID : ${nouveauAgentId}`);
+      
+      try {
+        // Enregistrement de la configuration d'aiguillage dans Firestore
+        await setDoc(doc(db, "config", "activeAgent"), {
+          agentId: nouveauAgentId,
+          misAJourLe: new Date().toISOString()
+        });
+        
+        // Rafraîchissement direct de la vue d'accueil
+        await loadScreen("accueil");
+        await loadAccueil();
+        
+        alert(`Bascule réussie ! Consultation du livret de : ${newSelect.options[newSelect.selectedIndex].text}`);
+      } catch (err) {
+        console.error("Erreur lors de la modification de l'agent actif :", err);
+        alert("Action refusée : Impossible de modifier l'agent cible.");
+      }
+    });
+
+  } catch (err) {
+    console.error("Erreur lors du paramétrage du sélecteur global :", err);
+  }
+}
+
+// =============================================================
+// CONNEXION
 // =============================================================
 export function loginAdmin() {
   const email = document.getElementById("login-email")?.value;
@@ -105,7 +260,6 @@ export function loginAdmin() {
   signInWithEmailAndPassword(auth, email, pass)
     .then(() => {
       console.log("Connexion réussie !");
-      // Le changement d'écran vers l'accueil est géré automatiquement par onAuthStateChanged
     })
     .catch((error) => {
       console.error("Erreur d'authentification :", error.message);
@@ -115,7 +269,7 @@ export function loginAdmin() {
 }
 
 // =============================================================
-// DÉCONNEXION (À lier à un bouton "Se déconnecter" si besoin)
+// DÉCONNEXION
 // =============================================================
 export function logoutAdmin() {
   signOut(auth).then(() => {
@@ -137,7 +291,6 @@ export async function loadAccueil() {
 
     const agent = agentDoc.data();
 
-    // --- 1. Éléments de l'Agent ---
     const nomEl = document.getElementById("agent-nom");
     const uniteEl = document.getElementById("agent-unite");
     const posteEl = document.getElementById("agent-poste");
@@ -152,15 +305,12 @@ export async function loadAccueil() {
     if (photoEl) photoEl.src = agent.photo || "img/default.jpg";
     if (moisEl) moisEl.textContent = "1";
 
-    // --- 2. Éléments du Tuteur (Nouveau !) ---
     const tuteurNomEl = document.getElementById("tuteur-nom");
     const tuteurFonctionEl = document.getElementById("tuteur-fonction");
-    const tuteurTelEl = document.getElementById("tuteur-tel");
     const tuteurMailEl = document.getElementById("tuteur-mail");
 
     if (tuteurNomEl) tuteurNomEl.textContent = agent.tuteurNom || "Non renseigné";
     if (tuteurFonctionEl) tuteurFonctionEl.textContent = agent.tuteurFonction || "";
-    if (tuteurTelEl) tuteurTelEl.textContent = agent.tuteurTel || "";
     if (tuteurMailEl) tuteurMailEl.textContent = agent.tuteurMail || "";
 
   } catch (err) {
