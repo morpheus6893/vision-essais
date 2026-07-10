@@ -31,7 +31,6 @@ function runScreenScript(name) {
   switch (name) {
     case "accueil":
       console.log("Écran Accueil injecté -> Récupération des données de l'agent...");
-      // Rechargement des données dynamiques pour éviter le retour au modèle par défaut
       import("./app.js?v=2")
         .then(module => {
           if (typeof module.loadAccueil === "function") {
@@ -50,7 +49,6 @@ function runScreenScript(name) {
       import(`./parcours.js?t=${Date.now()}`)
         .then(async (module) => {
           if (typeof module.initParcours === "function") {
-            // On récupère dynamiquement le rôle détecté dans app.js
             const { roleUtilisateurConnecte } = await import("./app.js?v=2");
             module.initParcours(roleUtilisateurConnecte);
           }
@@ -71,7 +69,6 @@ function runScreenScript(name) {
 
     case "admin":
       console.log("Écran Admin injecté -> Chargement du script d'administration");
-      // CORRECTION : Importation dynamique du module admin.js autonome
       import("./admin.js")
         .then(module => {
           if (typeof module.initAdmin === "function") {
@@ -87,9 +84,7 @@ function runScreenScript(name) {
       const loginForm = document.getElementById("login-form");
       if (loginForm) {
         loginForm.addEventListener("submit", async (event) => {
-          // Empêche le rechargement sauvage de la page par le navigateur
           event.preventDefault(); 
-          
           console.log("Formulaire soumis -> Appel Firebase Auth");
           const { loginAdmin } = await import("./app.js?v=2");
           loginAdmin();
@@ -107,9 +102,7 @@ function runScreenScript(name) {
 // =============================================================
 
 export function initNavigation() {
-  // On écoute TOUS les clics sur la page de manière globale
   document.addEventListener("click", (event) => {
-    // On vérifie si l'élément cliqué (ou l'un de ses parents directs) a un attribut data-screen
     const btn = event.target.closest("[data-screen]");
     
     if (btn) {
@@ -121,7 +114,6 @@ export function initNavigation() {
     }
   });
 
-  // Au premier chargement du site, on active visuellement le bouton "accueil" dans le menu
   setActiveButton("accueil");
 }
 
@@ -130,7 +122,6 @@ export function initNavigation() {
 // =============================================================
 
 function setActiveButton(screen) {
-  // On cible uniquement les boutons situés dans la barre de navigation du haut
   const menuButtons = document.querySelectorAll("nav [data-screen], .navbar [data-screen], header [data-screen]");
   
   menuButtons.forEach(btn => {

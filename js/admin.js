@@ -74,14 +74,16 @@ async function loadUsersTable() {
         querySnapshot.forEach((docSnap) => {
           if (docSnap.id === idTarget) {
             const u = docSnap.data();
-            document.getElementById("admin-user-nom").value = u.nom || "";
-            document.getElementById("admin-user-prenom").value = u.prenom || "";
-            document.getElementById("admin-user-email").value = u.email || "";
-            document.getElementById("admin-user-role").value = u.role || "apprenant";
-            document.getElementById("admin-user-unite").value = u.unite || "";
-            document.getElementById("admin-user-uid").value = (idTarget !== u.email) ? idTarget : "";
             
-            const formTitle = document.querySelector("#form-creation-user").previousElementSibling;
+            if(document.getElementById("admin-user-nom")) document.getElementById("admin-user-nom").value = u.nom || "";
+            if(document.getElementById("admin-user-prenom")) document.getElementById("admin-user-prenom").value = u.prenom || "";
+            if(document.getElementById("admin-user-email")) document.getElementById("admin-user-email").value = u.email || "";
+            if(document.getElementById("admin-user-role")) document.getElementById("admin-user-role").value = u.role || "apprenant";
+            if(document.getElementById("admin-user-unite")) document.getElementById("admin-user-unite").value = u.unite || "";
+            if(document.getElementById("admin-user-uid")) document.getElementById("admin-user-uid").value = (idTarget !== u.email) ? idTarget : "";
+            
+            const formCreationUser = document.getElementById("form-creation-user");
+            const formTitle = formCreationUser ? formCreationUser.previousElementSibling : null;
             if (formTitle) formTitle.textContent = `📝 Modifier l'accès de ${u.prenom} ${u.nom}`;
           }
         });
@@ -113,14 +115,15 @@ function initUserForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const nom = document.getElementById("admin-user-nom").value.trim().toUpperCase();
-    const prenom = document.getElementById("admin-user-prenom").value.trim();
-    const email = document.getElementById("admin-user-email").value.trim().toLowerCase();
-    const role = document.getElementById("admin-user-role").value;
-    const unite = document.getElementById("admin-user-unite").value.trim();
-    const uid = document.getElementById("admin-user-uid").value.trim();
+    const nom = document.getElementById("admin-user-nom")?.value.trim().toUpperCase() || "";
+    const prenom = document.getElementById("admin-user-prenom")?.value.trim() || "";
+    const email = document.getElementById("admin-user-email")?.value.trim().toLowerCase() || "";
+    const role = document.getElementById("admin-user-role")?.value || "apprenant";
+    const unite = document.getElementById("admin-user-unite")?.value.trim() || "";
+    const uid = document.getElementById("admin-user-uid")?.value.trim() || "";
 
     const docId = uid || email;
+    if (!docId) return alert("L'identifiant ou l'email est manquant.");
 
     try {
       await setDoc(doc(db, "users", docId), {
@@ -132,7 +135,7 @@ function initUserForm() {
       alert("🎉 Utilisateur configuré avec succès !");
       form.reset();
       
-      const formTitle = document.querySelector("#form-creation-user").previousElementSibling;
+      const formTitle = form.previousElementSibling;
       if (formTitle) formTitle.textContent = "➕ Déclarer un accès utilisateur";
 
       await initAdmin();
@@ -173,7 +176,7 @@ async function loadAdminTable() {
       tr.style.borderBottom = "1px solid #ddd";
       tr.innerHTML = `
         <td style="padding: 12px;">
-          <strong style="color:#0056b3;">${agent.nom || ""}</strong><br>
+          <strong style="color:#0056b3;">${agent.nomComplet || agent.nom || ""}</strong><br>
           <span style="font-size:0.8rem; color:#666;">${agent.poste || ""}</span>
         </td>
         <td style="padding: 12px;">
@@ -198,12 +201,22 @@ async function loadAdminTable() {
         snap.forEach(d => {
           if(d.id === id) {
             const data = d.data();
-            document.getElementById("agent-form-id").value = id;
-            document.getElementById("agent-form-nom").value = data.nom || "";
-            document.getElementById("agent-form-unite").value = data.unite || "";
-            document.getElementById("agent-form-session").value = data.session || "";
-            document.getElementById("agent-form-poste").value = data.poste || "";
-            document.getElementById("agent-form-tuteur").value = data.tuteurId || "";
+            
+            if(document.getElementById("agent-form-id")) document.getElementById("agent-form-id").value = id;
+            
+            // Extraction intelligente pour séparer le prénom et le nom de famille
+            const nomCompletSource = data.nomComplet || data.nom || "";
+            const parties = nomCompletSource.trim().split(" ");
+            const prenomDetecte = parties[0] || "";
+            const nomDetecte = parties.slice(1).join(" ") || ""; // Prise en compte des noms composés
+
+            if(document.getElementById("agent-form-prenom")) document.getElementById("agent-form-prenom").value = prenomDetecte;
+            if(document.getElementById("agent-form-nom-famille")) document.getElementById("agent-form-nom-famille").value = nomDetecte;
+            
+            if(document.getElementById("agent-form-unite")) document.getElementById("agent-form-unite").value = data.unite || "";
+            if(document.getElementById("agent-form-session")) document.getElementById("agent-form-session").value = data.session || "";
+            if(document.getElementById("agent-form-poste")) document.getElementById("agent-form-poste").value = data.poste || "";
+            if(document.getElementById("agent-form-tuteur")) document.getElementById("agent-form-tuteur").value = data.tuteurId || "";
             
             // Chargement de la chaîne Base64 ou de l'URL dans l'aperçu circulaire
             const previewImg = document.getElementById("agent-form-preview");
@@ -214,7 +227,8 @@ async function loadAdminTable() {
             const fileInput = document.getElementById("agent-form-file");
             if (fileInput) fileInput.value = "";
 
-            document.getElementById("agent-form-title").textContent = `✏️ Modifier la fiche de ${data.nom}`;
+            const formTitle = document.getElementById("agent-form-title");
+            if(formTitle) formTitle.textContent = `✏️ Modifier la fiche de ${nomCompletSource}`;
           }
         });
       });
@@ -264,24 +278,47 @@ function initAgentFormFormulaire() {
   const newBtn = document.getElementById("btn-save-agent");
 
   newBtn.addEventListener("click", async () => {
-    const id = document.getElementById("agent-form-id").value;
-    const nom = document.getElementById("agent-form-nom").value.trim();
-    const unite = document.getElementById("agent-form-unite").value.trim();
-    const session = document.getElementById("agent-form-session").value.trim();
-    const poste = document.getElementById("agent-form-poste").value.trim();
+    const idInput = document.getElementById("agent-form-id");
+    const id = idInput ? idInput.value : "";
+    
+    // Récupération sécurisée des deux nouveaux champs distincts
+    const nomFamilleInput = document.getElementById("agent-form-nom-famille") || document.getElementById("agent-form-nom");
+    const prenomInput = document.getElementById("agent-form-prenom");
+    
+    if (!nomFamilleInput || !prenomInput) {
+      return alert("Erreur technique : Les éléments du formulaire Nom ou Prénom restent introuvables.");
+    }
+
+    const nomFamille = nomFamilleInput.value.trim().toUpperCase();
+    const prenom = prenomInput.value.trim();
+    
+    const uniteInput = document.getElementById("agent-form-unite");
+    const sessionInput = document.getElementById("agent-form-session");
+    const posteInput = document.getElementById("agent-form-poste");
+
+    const unite = uniteInput ? uniteInput.value.trim() : "";
+    const session = sessionInput ? sessionInput.value.trim() : "";
+    const poste = posteInput ? posteInput.value.trim() : "";
     
     // Récupération de l'image présente dans l'aperçu au moment du clic
     const currentPreview = document.getElementById("agent-form-preview");
     const photo = currentPreview ? currentPreview.src : "img/default.jpg";
     
     const tuteurSelect = document.getElementById("agent-form-tuteur");
-    const tuteurId = tuteurSelect.value;
-    const tuteurNom = tuteurSelect.options[tuteurSelect.selectedIndex]?.text || "";
+    const tuteurId = tuteurSelect ? tuteurSelect.value : "";
+    const tuteurNom = tuteurSelect && tuteurSelect.options[tuteurSelect.selectedIndex] ? tuteurSelect.options[tuteurSelect.selectedIndex].text : "";
 
-    if (!nom) return alert("Le nom de l'agent est requis.");
+    if (!nomFamille || !prenom) {
+      return alert("Le NOM et le Prénom de l'agent sont requis.");
+    }
+
+    // Reconstitution propre au format standardisé attendu par le reste de l'application
+    const nomCompletUnifie = `${prenom} ${nomFamille}`;
 
     const payload = {
-      nom, unite, session, poste,
+      nom: nomCompletUnifie,        // Rétrocompatibilité avec d'anciens affichages
+      nomComplet: nomCompletUnifie, // Format standardisé
+      unite, session, poste,
       tuteurId,
       tuteurNom: tuteurId ? tuteurNom : "Non renseigné",
       photo: photo
@@ -296,20 +333,23 @@ function initAgentFormFormulaire() {
         alert("Nouvel agent créé !");
       }
       
-      // Reset complet du formulaire après traitement
-      document.getElementById("agent-form-id").value = "";
-      document.getElementById("agent-form-nom").value = "";
-      document.getElementById("agent-form-unite").value = "";
-      document.getElementById("agent-form-session").value = "";
-      document.getElementById("agent-form-poste").value = "";
-      document.getElementById("agent-form-tuteur").value = "";
+      // Reset complet du formulaire après traitement (avec vérifications de sécurité)
+      if(document.getElementById("agent-form-id")) document.getElementById("agent-form-id").value = "";
+      if(document.getElementById("agent-form-nom-famille")) document.getElementById("agent-form-nom-famille").value = "";
+      if(document.getElementById("agent-form-nom")) document.getElementById("agent-form-nom").value = "";
+      if(document.getElementById("agent-form-prenom")) document.getElementById("agent-form-prenom").value = "";
+      if(document.getElementById("agent-form-unite")) document.getElementById("agent-form-unite").value = "";
+      if(document.getElementById("agent-form-session")) document.getElementById("agent-form-session").value = "";
+      if(document.getElementById("agent-form-poste")) document.getElementById("agent-form-poste").value = "";
+      if(document.getElementById("agent-form-tuteur")) document.getElementById("agent-form-tuteur").value = "";
       
       if (fileInput) fileInput.value = ""; 
       if (previewImg) previewImg.src = "img/default.jpg"; 
       
-      document.getElementById("agent-form-title").textContent = "Créer ou Modifier une fiche Agent";
+      const formTitle = document.getElementById("agent-form-title");
+      if(formTitle) formTitle.textContent = "Créer ou Modifier une fiche Agent";
       
       loadAdminTable();
-    } catch(err) { console.error(err); }
+    } catch(err) { console.error("Erreur lors de la sauvegarde Firestore :", err); }
   });
 }

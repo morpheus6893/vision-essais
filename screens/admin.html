@@ -2,6 +2,21 @@
   <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">🛡️ Espace Administration – Droits & Liaisons</h2>
   
   <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px;">
+    <h3 style="margin-top: 0; color: #28a745; font-size: 1.1rem; margin-bottom: 15px;">📅 Configuration des Sessions – Importer un Planning PDF</h3>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Glissez-deposez le calendrier officiel de formation (format PDF type Session 26.2) pour créer ou mettre à jour automatiquement la frise chronologique des agents associés.</p>
+    
+    <div id="drop-zone-planning" style="border: 2px dashed #cbd5e1; padding: 30px; text-align: center; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: #fafafa;">
+      <p style="margin: 0; color: #475569; font-weight: 500;">📥 Glissez-déposez le calendrier PDF de session ici ou</p>
+      <label for="file-planning" style="display: inline-block; margin-top: 12px; background-color: #28a745; color: white; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        Parcourir les fichiers
+      </label>
+      <input type="file" id="file-planning" accept="application/pdf" style="display: none;" />
+    </div>
+    
+    <div id="planning-status" style="margin-top: 12px; font-size: 0.9rem; color: #64748b; font-style: italic;">Aucun fichier chargé.</div>
+  </div>
+
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px;">
     <h3 style="margin-top: 0; color: #1e293b; font-size: 1.1rem; margin-bottom: 15px;">➕ Déclarer un accès utilisateur</h3>
     
     <form id="form-creation-user" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -71,9 +86,16 @@
       
       <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
         <input type="hidden" id="agent-form-id">
-        <input type="text" id="agent-form-nom" placeholder="Nom complet (ex: Tristan ANTOINE)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; width: 100%;">
+        
+        <div style="grid-column: span 1; display: flex; gap: 8px;">
+          <input type="text" id="agent-form-nom-famille" placeholder="NOMres" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; text-transform: uppercase;">
+          <input type="text" id="agent-form-prenom" placeholder="Prénom" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+        </div>
+
         <input type="text" id="agent-form-unite" placeholder="Unité (ex: ET Dijon)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; width: 100%;">
-        <input type="text" id="agent-form-session" placeholder="Session (ex: 14 Bis)" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; width: 100%;">
+        <select id="agent-form-session" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; box-sizing: border-box; width: 100%;">
+          <option value="">-- Choisir une Session --</option>
+        </select>
         
         <select id="agent-form-tuteur" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; box-sizing: border-box; width: 100%;">
           <option value="">-- Choisir un Tuteur Référent --</option>

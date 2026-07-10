@@ -26,6 +26,9 @@ import {
 // =============================================================
 import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs";
 
+// Partage explicite de pdfjsLib sur l'objet global window pour les modules dépendants (ex: importPlanning.js)
+window.pdfjsLib = pdfjsLib;
+
 // =============================================================
 // Firebase – Configuration
 // =============================================================
@@ -51,6 +54,7 @@ let uniteUtilisateurActuel = "";
 // =============================================================
 import { initNavigation, loadScreen } from "./navigation.js?v=2";
 import { initParcours } from "./parcours.js"; // 📘 Suivi de parcours
+import { initImportPlanning } from "./importPlanning.js"; // 📅 Importation des plannings de sessions
 
 // =============================================================
 // Initialisation globale & Sécurisation des routes
@@ -76,6 +80,13 @@ document.addEventListener("DOMContentLoaded", () => {
       // Si on retourne sur l'accueil, on recharge les datas de l'agent
       if (e.target.closest('[data-screen="accueil"]') || e.target.textContent.includes("Accueil")) {
         setTimeout(() => tryLoadAccueil(), 150);
+      }
+      // Si on se rend sur l'onglet d'administration, on initialise le module d'import de planning et les sessions
+      if (e.target.closest('[data-screen="admin"]') || e.target.textContent.includes("Admin")) {
+        setTimeout(async () => {
+          initImportPlanning();
+          await chargerSessionsDansFormulaire();
+        }, 150);
       }
     });
   }
@@ -315,6 +326,35 @@ export async function loadAccueil() {
 
   } catch (err) {
     console.error("Erreur lors du chargement de l’accueil :", err);
+  }
+}
+
+// =============================================================
+// ADMINISTRATION – Remplissage dynamique des sessions existantes
+// =============================================================
+async function chargerSessionsDansFormulaire() {
+  const sessionSelect = document.getElementById("agent-form-session");
+  if (!sessionSelect) return;
+
+  try {
+    // Récupération de toutes les sessions créées à partir des imports de plannings PDF
+    const querySnapshot = await getDocs(collection(db, "sessions"));
+    
+    // Réinitialisation du sélecteur avec l'option par défaut
+    sessionSelect.innerHTML = '<option value="">-- Choisir une Session --</option>';
+
+    querySnapshot.forEach((docSnap) => {
+      const sessionData = docSnap.data();
+      // On extrait la version propre du nom de la session (ex: "26.2" au lieu de "session_26_2")
+      const nomSession = sessionData.nom || docSnap.id.replace("session_", "");
+      
+      const option = document.createElement("option");
+      option.value = nomSession; // Clé d'association enregistrée dans le profil de l'agent
+      option.textContent = `Session ${nomSession}`;
+      sessionSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Erreur lors du chargement des sessions pour le formulaire :", err);
   }
 }
 
